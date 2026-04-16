@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./viewproduct.css";
+import "./Viewproduct.css";
 
 function ViewProduct() {
   const [products, setProducts] = useState([]);
