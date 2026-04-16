@@ -1,0 +1,115 @@
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#f1f1f1;
+}
+
+
+.main-box{
+  width:700px;
+  margin:40px auto;
+  background:white;
+  border:1px solid #ddd;
+}
+
+
+.offer img{
+  width:100%;
+  height:140px;
+  object-fit:cover;
+}
+
+.login-box{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+    text-align:center;
+}
+
+h2{
+  margin-bottom:25px;
+}
+
+label{
+    display:block;
+    text-align:left;
+    margin-bottom:5px;
+    font-size:14px;
+}
+
+label span{
+  color:red;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+
+.continue{
+  width:50%;
+  padding:12px;
+  background:#ff5a3c;
+  border:none;
+  color:rgb(249, 127, 74);
+  font-weight:bold;
+  border-radius:16px;
+  font-size:16px;
+  cursor: pointer;
+}
+
+.btn{
+    width:100%;
+    padding:12px;
+    background:#ff5a3c;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#e64a2e;
+}
+
+.register{
+  margin-top:15px;
+  font-size:14px;
+}
+
+.register span{
+  color:#2874f0;
+  font-weight:bold;
+}
+
+.line{
+  margin:25px 0;
+  color:gray;
+  position:relative;
+}
+
+.google img{
+  width:35px;
+}
+
+.terms{
+  font-size:12px;
+  color:gray;
+  margin-top:20px;
+}
+
+
+
+
+
+
+
+
+
+

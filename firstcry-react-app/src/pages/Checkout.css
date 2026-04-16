@@ -1,0 +1,25 @@
+.checkout {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.order-btn {
+    width: 100%;
+    padding: 12px;
+    background: #fc2779;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

@@ -1,0 +1,145 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial;
+    background: #f5f5f5;
+}
+
+
+.topbar {
+    width: 100%;
+    background: #000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 25px;
+    color: white;
+    font-size: 14px;
+}
+
+
+.menu {
+    width: 100%;
+    background: #ffd200;
+    padding: 12px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-weight: bold;
+}
+
+.menu a {
+    cursor: pointer;
+}
+
+
+.header {
+    width: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.logo {
+    font-size: 28px;
+    color: #ff6f00;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.search input {
+    width: 400px;
+    padding: 10px;
+}
+
+
+.banner-new img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.premium {
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    background: white;
+}
+
+.premium-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+
+.premium-card {
+    width: 260px;
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.premium-img img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.seasonal {
+    padding: 30px 20px;
+}
+
+.seasonal-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.seasonal-row img {
+    height: 180px;
+    border-radius: 6px;
+}
+
+
+.admin-products {
+    padding: 50px 20px;
+}
+
+.admin-title {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 30px;
+}
+
+
+.admin-product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+
+.admin-product-card {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.admin-product-card:hover {
+    transform: translateY(-5px);
+}
+
+.admin-product-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+}

@@ -1,0 +1,113 @@
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
+/* main container */
+.main-box{
+  width:750px;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+/* banner image */
+.offer img{
+  width:100%;
+  display:block;
+}
+
+/* form box */
+.login-box{
+  padding:40px 80px;
+  text-align:center;
+}
+
+/* heading */
+.login-box h2{
+  margin-bottom:25px;
+  font-weight:500;
+}
+
+/* label */
+.login-box label{
+  display:block;
+  text-align:left;
+  margin-bottom:6px;
+  font-size:14px;
+  color:#333;
+}
+
+/* input field */
+.login-box input{
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:4px;
+  background:white;
+  margin-bottom:20px;
+  font-size:14px;
+  outline:none;
+}
+
+.login-box input:focus{
+  border-color:#ff5a1f;
+}
+
+/* main button */
+.btn{
+  width:100%;
+  padding:12px;
+  background:#ff5a1f;
+  border:none;
+  color:white;
+  font-weight:bold;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.btn:hover{
+  background:#e94e16;
+}
+
+/* register text */
+.register{
+  margin-top:12px;
+  font-size:14px;
+  color:#333;
+}
+
+/* OR line */
+.or{
+  margin:25px 0 15px;
+  color:#777;
+  font-size:14px;
+}
+
+/* google button */
+.google-btn{
+  margin:0 auto;
+  width:200px;
+  padding:10px;
+  border:1px solid #ccc;
+  background:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border-radius:4px;
+}
+
+/* terms */
+.terms{
+  margin-top:25px;
+  font-size:12px;
+  color:#777;
+}
