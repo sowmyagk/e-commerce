@@ -14,7 +14,7 @@ function AddProduct() {
 
   useEffect(() => {
     if (id) {
-      fetch("http://localhost:3001/api/products")
+      fetch(`${import.meta.env.VITE_API_URL}/api/products`)
         .then(res => res.json())
         .then(data => {
           const product = data.find(p => p._id === id);
@@ -32,7 +32,7 @@ function AddProduct() {
   const handleAdd = async () => {
 
     if (id) {
-      await fetch(`http://localhost:3001/api/products/update-product/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/products/update-product/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +61,7 @@ function AddProduct() {
       formData.append("productdescription", productdescription);
       formData.append("image", image);
 
-      await fetch("http://localhost:3001/api/products/add-product", {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/products/add-product`, {
         method: "POST",
         body: formData
       });

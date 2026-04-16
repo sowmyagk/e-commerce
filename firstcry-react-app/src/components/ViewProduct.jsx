@@ -11,7 +11,7 @@ function ViewProduct() {
   }, []);
 
   const fetchProducts = () => {
-    fetch("http://localhost:3001/api/products")
+    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.log(err));
@@ -21,7 +21,7 @@ function ViewProduct() {
     const confirmDelete = window.confirm("Are you sure?");
     if (!confirmDelete) return;
 
-    await fetch(`http://localhost:3001/api/products/remove-product/${id}`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/products/remove-product/${id}`, {
       method: "DELETE"
     });
 
