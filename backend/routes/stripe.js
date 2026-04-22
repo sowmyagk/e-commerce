@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 router.post("/create-checkout-session", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      ui_mode: "hosted_page", // ✅ FIXED
+      ui_mode: "hosted_page", 
 
       payment_method_types: ["card"],
 
@@ -30,7 +30,7 @@ router.post("/create-checkout-session", async (req, res) => {
       cancel_url: "http://localhost:5173/cancel",
     });
 
-    res.json({ url: session.url }); // ✅ IMPORTANT
+    res.json({ url: session.url }); 
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -40,6 +40,3 @@ router.post("/create-checkout-session", async (req, res) => {
 module.exports = router;
 
 
-
-
-//MONGO_URL=mongodb://127.0.0.1:27017/firstcry
