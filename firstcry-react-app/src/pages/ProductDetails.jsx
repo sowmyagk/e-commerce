@@ -14,8 +14,37 @@ function ProductDetails() {
       });
   }, [id]);
 
+//const addToCart = () => {
+  //const user = JSON.parse(localStorage.getItem("user"));
+
+  //fetch(`${import.meta.env.VITE_API_URL}/api/cart`, {
+    //method: "POST",
+    //headers: {
+    //  "Content-Type": "application/json"
+   // },
+    //body: JSON.stringify({
+    //  userId: user.value,   
+     // name: product.name,
+     // price: Number(product.price),
+     // brand: product.brand,
+     // image: product.image,
+     // quantity: 1
+  //  })
+  //})
+   // .then(res => res.json())
+   // .then(() => {
+  //    alert("Product added to cart");
+  //  });
+//};
+
 const addToCart = () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ CHECK USER FIRST
+  if (!user || !user.value) {
+    alert("Please login first");
+    return;
+  }
 
   fetch(`${import.meta.env.VITE_API_URL}/api/cart`, {
     method: "POST",
@@ -23,7 +52,7 @@ const addToCart = () => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      userId: user.value,   
+      userId: user.value,
       name: product.name,
       price: Number(product.price),
       brand: product.brand,
@@ -34,9 +63,9 @@ const addToCart = () => {
     .then(res => res.json())
     .then(() => {
       alert("Product added to cart");
-    });
+    })
+    .catch(err => console.log(err));
 };
-
   if (!product) return <h2>Loading...</h2>;
 
   return (

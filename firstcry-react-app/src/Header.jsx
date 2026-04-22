@@ -6,12 +6,29 @@ function Header() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
-      .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(err => console.log(err));
-  }, []);
+  //useEffect(() => {
+   // fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+   //   .then(res => res.json())
+   //   .then(data => setProducts(data))
+  //    .catch(err => console.log(err));
+ // }, []);
+
+
+
+ useEffect(() => {
+  fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("API failed");
+      }
+      return res.json();
+    })
+    .then(data => setProducts(data))
+    .catch(err => {
+      console.log("API ERROR:", err);
+      setProducts([]); // prevent crash
+    });
+}, []);
 
   return (
     <>

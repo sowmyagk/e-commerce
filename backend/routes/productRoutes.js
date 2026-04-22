@@ -6,10 +6,16 @@ const Product = require("../models/Product");
 
 const router = express.Router();
 
+/* ✅ ENSURE UPLOADS FOLDER EXISTS */
+const uploadDir = "uploads";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
+/* MULTER CONFIG */
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + path.extname(file.originalname);
@@ -19,7 +25,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
+/* ADD PRODUCT */
 router.post("/add-product", upload.single("image"), async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -41,12 +47,12 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.log(error);
+    console.error("ADD PRODUCT ERROR:", error);
     res.status(500).json({ success: false });
   }
 });
 
-
+/* GET ALL PRODUCTS */
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
@@ -58,19 +64,19 @@ router.get("/", async (req, res) => {
       brand: p.brand,
       productdescription: p.productdescription,
       image: p.image
-        ? `http://localhost:3001/uploads/${p.image}`
+        ? `${req.protocol}://${req.get("host")}/uploads/${p.image}`
         : null
     }));
 
     res.json(result);
 
   } catch (error) {
-    console.log(error);
+    console.error("GET PRODUCTS ERROR:", error);
     res.status(500).json({ message: "Error fetching products" });
   }
 });
 
-
+/* UPDATE PRODUCT */
 router.put("/update-product/:id", async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -85,12 +91,12 @@ router.put("/update-product/:id", async (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.log(error);
+    console.error("UPDATE ERROR:", error);
     res.status(500).json({ success: false });
   }
 });
 
-
+/* DELETE PRODUCT */
 router.delete("/remove-product/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -110,7 +116,7 @@ router.delete("/remove-product/:id", async (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.log(error);
+    console.error("DELETE ERROR:", error);
     res.status(500).json({ success: false });
   }
 });

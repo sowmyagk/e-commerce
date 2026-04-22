@@ -3,12 +3,28 @@ import React, { useEffect, useState } from "react";
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
 
+  //useEffect(() => {
+  //  fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
+     // .then(res => res.json())
+    //  .then(data => setOrders(data))
+   //   .catch(err => console.log(err));
+  //}, []);
+
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
-      .then(res => res.json())
-      .then(data => setOrders(data))
-      .catch(err => console.log(err));
-  }, []);
+  fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("ORDERS:", data); // ✅ DEBUG
+
+      if (Array.isArray(data)) {
+        setOrders(data);
+      } else {
+        console.log("Not an array:", data);
+        setOrders([]); // ✅ prevent crash
+      }
+    })
+    .catch(err => console.log(err));
+}, []);
 
   return (
     <div style={{ padding: "20px" }}>

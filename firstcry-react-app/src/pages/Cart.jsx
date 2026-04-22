@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -5,15 +6,29 @@ function Cart() {
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
-useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  // ✅ Fetch cart data
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
 
-  fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.value}`) // ✅ pass userId
-    .then(res => res.json())
-    .then(data => setCart(data));
-}, []);
+    if (!user || !user.value) {
+      console.log("User not logged in");
+      return;
+    }
 
+    fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.value}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCart(data);
+        } else {
+          console.log("Invalid cart data:", data);
+          setCart([]);
+        }
+      })
+      .catch(err => console.log("Cart fetch error:", err));
+  }, []);
 
+  // ✅ Increase quantity
   const increaseQty = (id) => {
     const updated = cart.map(item =>
       item._id === id
@@ -23,7 +38,7 @@ useEffect(() => {
     setCart(updated);
   };
 
-
+  // ✅ Decrease quantity
   const decreaseQty = (id) => {
     const updated = cart.map(item =>
       item._id === id && item.quantity > 1
@@ -33,30 +48,21 @@ useEffect(() => {
     setCart(updated);
   };
 
+  // ✅ Remove item
   const removeItem = (id) => {
     fetch(`${import.meta.env.VITE_API_URL}/api/cart/${id}`, {
       method: "DELETE"
-    }).then(() => {
-      setCart(cart.filter(item => item._id !== id));
-    });
+    })
+      .then(() => {
+        setCart(cart.filter(item => item._id !== id));
+      })
+      .catch(err => console.log("Delete error:", err));
   };
 
+  // ✅ Total price
   const totalPrice = cart.reduce((total, item) => {
     return total + item.price * item.quantity;
   }, 0);
-
-
-  const placeOrder = () => {
-  fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-    method: "POST"
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert("Order placed successfully");
-      setCart([]); 
-    })
-    .catch(err => console.log(err));
-};
 
   return (
     <div style={{ padding: "20px" }}>
@@ -74,7 +80,7 @@ useEffect(() => {
 
               <div>
                 <button onClick={() => decreaseQty(item._id)}>-</button>
-                <span>{item.quantity}</span>
+                <span style={{ margin: "0 10px" }}>{item.quantity}</span>
                 <button onClick={() => increaseQty(item._id)}>+</button>
               </div>
 
@@ -85,16 +91,18 @@ useEffect(() => {
           ))}
 
           <h2>Total: ₹{totalPrice}</h2>
+
+          {/* ✅ Navigate to checkout */}
           <button onClick={() => navigate("/checkout")}>
-           Place Order
+            Place Order
           </button>
         </>
       )}
 
-      <button onClick={() => window.location.href="/orders"}>
-  View Orders
-</button>
-      
+      {/* ✅ View orders */}
+      <button onClick={() => navigate("/orders")}>
+        View Orders
+      </button>
     </div>
   );
 }

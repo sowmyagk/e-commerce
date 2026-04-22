@@ -23,6 +23,30 @@ function Checkout() {
 
   const handleOrder = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user || !user.value) {
+        alert("Please login first");
+        return;
+      }
+
+      // ✅ Get cart items
+      const cartRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/cart/${user.value}`
+      );
+      const cart = await cartRes.json();
+
+      if (!Array.isArray(cart) || cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+
+      // ✅ Calculate total
+      const totalPrice = cart.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
+
+      // ✅ Save address
       await fetch(`${import.meta.env.VITE_API_URL}/api/address/add`, {
         method: "POST",
         headers: {
@@ -31,11 +55,21 @@ function Checkout() {
         body: JSON.stringify(address)
       });
 
+      // ✅ CREATE ORDER (FIXED)
       await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-        method: "POST"
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: user.value,
+          items: cart,
+          totalAmount: totalPrice
+        })
       });
 
       alert("Order placed successfully!");
+
       navigate("/orders");
 
     } catch (err) {
@@ -49,23 +83,24 @@ function Checkout() {
       handleOrder();
     } else {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ address })
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ address })
+          }
+        );
 
         const data = await res.json();
-        console.log("Stripe response:", data);
 
         if (!data.url) {
           alert("Stripe URL not received");
           return;
         }
 
-     
         window.location.href = data.url;
 
       } catch (err) {
@@ -86,7 +121,11 @@ function Checkout() {
         <input name="phone" placeholder="Phone Number" onChange={handleChange} />
         <input name="city" placeholder="City" onChange={handleChange} />
         <input name="pincode" placeholder="Pincode" onChange={handleChange} />
-        <textarea name="addressLine" placeholder="Full Address" onChange={handleChange}></textarea>
+        <textarea
+          name="addressLine"
+          placeholder="Full Address"
+          onChange={handleChange}
+        ></textarea>
       </div>
 
       <div className="section">
