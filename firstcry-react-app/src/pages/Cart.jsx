@@ -6,7 +6,6 @@ function Cart() {
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ Fetch cart data
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -28,7 +27,6 @@ function Cart() {
       .catch(err => console.log("Cart fetch error:", err));
   }, []);
 
-  // ✅ Increase quantity
   const increaseQty = (id) => {
     const updated = cart.map(item =>
       item._id === id
@@ -38,7 +36,6 @@ function Cart() {
     setCart(updated);
   };
 
-  // ✅ Decrease quantity
   const decreaseQty = (id) => {
     const updated = cart.map(item =>
       item._id === id && item.quantity > 1
@@ -48,7 +45,6 @@ function Cart() {
     setCart(updated);
   };
 
-  // ✅ Remove item
   const removeItem = (id) => {
     fetch(`${import.meta.env.VITE_API_URL}/api/cart/${id}`, {
       method: "DELETE"
@@ -59,7 +55,6 @@ function Cart() {
       .catch(err => console.log("Delete error:", err));
   };
 
-  // ✅ Total price
   const totalPrice = cart.reduce((total, item) => {
     return total + item.price * item.quantity;
   }, 0);

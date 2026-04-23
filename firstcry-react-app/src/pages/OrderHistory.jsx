@@ -14,13 +14,13 @@ function OrderHistory() {
   fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
     .then(res => res.json())
     .then(data => {
-      console.log("ORDERS:", data); // ✅ DEBUG
+      console.log("ORDERS:", data); 
 
       if (Array.isArray(data)) {
         setOrders(data);
       } else {
         console.log("Not an array:", data);
-        setOrders([]); // ✅ prevent crash
+        setOrders([]);
       }
     })
     .catch(err => console.log(err));

@@ -30,7 +30,7 @@ function Checkout() {
         return;
       }
 
-      // ✅ Get cart items
+  
       const cartRes = await fetch(
         `${import.meta.env.VITE_API_URL}/api/cart/${user.value}`
       );
@@ -41,12 +41,11 @@ function Checkout() {
         return;
       }
 
-      // ✅ Calculate total
       const totalPrice = cart.reduce((total, item) => {
         return total + item.price * item.quantity;
       }, 0);
 
-      // ✅ Save address
+     
       await fetch(`${import.meta.env.VITE_API_URL}/api/address/add`, {
         method: "POST",
         headers: {
@@ -55,7 +54,7 @@ function Checkout() {
         body: JSON.stringify(address)
       });
 
-      // ✅ CREATE ORDER (FIXED)
+     
       await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
