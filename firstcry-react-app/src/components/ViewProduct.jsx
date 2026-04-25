@@ -35,12 +35,12 @@ function ViewProduct() {
       {products.map((item) => (
         <div key={item._id} className="product-row">
 
-          {/* IMAGE */}
-          <img
-            src={item.image}
-            alt="product"
+         <img
+           src={`${import.meta.env.VITE_API_URL}/${item.image}`}
+           alt="product"
             className="product-img"
           />
+          
 
           {/* NAME */}
           <span className="product-name">
