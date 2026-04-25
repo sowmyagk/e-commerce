@@ -6,13 +6,11 @@ const Product = require("../models/Product");
 
 const router = express.Router();
 
-/* ✅ ENSURE UPLOADS FOLDER EXISTS */
 const uploadDir = "uploads";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-/* MULTER CONFIG */
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -25,7 +23,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/* ADD PRODUCT */
 router.post("/add-product", upload.single("image"), async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -52,7 +49,6 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
   }
 });
 
-/* GET ALL PRODUCTS */
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
@@ -76,7 +72,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* UPDATE PRODUCT */
 router.put("/update-product/:id", async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -96,7 +91,6 @@ router.put("/update-product/:id", async (req, res) => {
   }
 });
 
-/* DELETE PRODUCT */
 router.delete("/remove-product/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

@@ -14,6 +14,21 @@ const stripeRoutes = require("./routes/stripe");
 
 const app = express();
 
+cloudinary.config({
+  cloud_name: "dj6dmhbgi",
+  api_key: "338773856424249",
+  api_secret: "trgLZKfs0JLrPP3ihVIJhVaFJxI",
+})
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'Apr26th2026',
+    format: async (req, file) => 'png', 
+    public_id: (req, file) => file.filename + "-" + Date.now(),
+  },
+});
+ 
 
 app.use(cors());
 app.use(express.json());
