@@ -13,12 +13,11 @@ const addressRoutes = require("./routes/addressRoutes");
 const stripeRoutes = require("./routes/stripe");
 
 const app = express();
-
 cloudinary.config({
-  cloud_name: "dj6dmhbgi",
-  api_key: "338773856424249",
-  api_secret: "trgLZKfs0JLrPP3ihVIJhVaFJxI",
-})
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
