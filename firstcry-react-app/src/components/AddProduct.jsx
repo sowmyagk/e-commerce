@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import "./AddProduct.css";
 
 function AddProduct() {
-
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -15,9 +15,9 @@ function AddProduct() {
   useEffect(() => {
     if (id) {
       fetch(`${import.meta.env.VITE_API_URL}/api/products`)
-        .then(res => res.json())
-        .then(data => {
-          const product = data.find(p => p._id === id);
+        .then((res) => res.json())
+        .then((data) => {
+          const product = data.find((p) => p._id === id);
 
           if (product) {
             setName(product.name);
@@ -30,31 +30,30 @@ function AddProduct() {
   }, [id]);
 
   const handleAdd = async () => {
-
     if (id) {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/products/update-product/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          price,
-          brand,
-          productdescription
-        })
-      });
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/api/products/update-product/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            price,
+            brand,
+            productdescription,
+          }),
+        }
+      );
 
       alert("Product Updated");
-      navigate("/viewproduct");  
-
+      navigate("/viewproduct");
     } else {
-
       if (!name || !price || !brand || !productdescription || !image) {
         alert("Fill all fields");
         return;
       }
 
       const formData = new FormData();
-
       formData.append("name", name);
       formData.append("price", price);
       formData.append("brand", brand);
@@ -63,7 +62,7 @@ function AddProduct() {
 
       await fetch(`${import.meta.env.VITE_API_URL}/api/products/add-product`, {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       alert("Product Added");
@@ -77,23 +76,54 @@ function AddProduct() {
   };
 
   return (
-    <div>
-      <h2>{id ? "Update Product" : "Add Product"}</h2>
+    <div className="add-product-page">
+      <div className="add-product-box">
+        <h2 className="add-product-title">
+          {id ? "Update Product" : "Add Product"}
+        </h2>
 
-      <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} /><br /><br />
-      <input placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} /><br /><br />
-      <input placeholder="Brand" value={brand} onChange={e => setBrand(e.target.value)} /><br /><br />
-      <input placeholder="Description" value={productdescription} onChange={e => setProductDescription(e.target.value)} /><br /><br />
+        <div className="add-product-form">
+          <input
+            type="text"
+            placeholder="Product Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-      {!id && (
-        <>
-          <input type="file" onChange={e => setImage(e.target.files[0])} /><br /><br />
-        </>
-      )}
+          <input
+            type="text"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
 
-      <button onClick={handleAdd}>
-        {id ? "Update" : "Add"}
-      </button>
+          <input
+            type="text"
+            placeholder="Brand"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+          />
+
+          <input
+            type="text"
+            placeholder="Description"
+            value={productdescription}
+            onChange={(e) => setProductDescription(e.target.value)}
+          />
+
+          {!id && (
+            <input
+              type="file"
+              className="file-input"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          )}
+
+          <button className="add-product-btn" onClick={handleAdd}>
+            {id ? "Update Product" : "Add Product"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

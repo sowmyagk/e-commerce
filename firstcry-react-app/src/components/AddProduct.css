@@ -1,0 +1,79 @@
+/* AddProduct.css */
+
+.add-product-page {
+  min-height: 100vh;
+  background: #f8f9fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 15px;
+}
+
+.add-product-box {
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  padding: 35px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.add-product-title {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 25px;
+}
+
+.add-product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-product-form input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.add-product-form input:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+}
+
+.file-input {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.add-product-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-product-btn:hover {
+  background: #e74d4d;
+}
+
+@media (max-width: 600px) {
+  .add-product-box {
+    padding: 25px 20px;
+  }
+
+  .add-product-title {
+    font-size: 24px;
+  }
+}
