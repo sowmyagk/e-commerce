@@ -3,28 +3,30 @@ import React, { useEffect, useState } from "react";
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
 
-  //useEffect(() => {
-  //  fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
-     // .then(res => res.json())
-    //  .then(data => setOrders(data))
-   //   .catch(err => console.log(err));
-  //}, []);
-
   useEffect(() => {
-  fetch(`${import.meta.env.VITE_API_URL}/api/orders`)
-    .then(res => res.json())
-    .then(data => {
-      console.log("ORDERS:", data); 
+    const user = JSON.parse(localStorage.getItem("user"));
 
-      if (Array.isArray(data)) {
-        setOrders(data);
-      } else {
-        console.log("Not an array:", data);
-        setOrders([]);
-      }
-    })
-    .catch(err => console.log(err));
-}, []);
+   
+    if (!user || !user.value) {
+      console.log("User not logged in");
+      return;
+    }
+
+   
+    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${user.value}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("ORDERS:", data);
+
+        if (Array.isArray(data)) {
+          setOrders(data);
+        } else {
+          console.log("Not an array:", data);
+          setOrders([]);
+        }
+      })
+      .catch(err => console.log(err));
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -43,16 +45,35 @@ function OrderHistory() {
             }}
           >
             <h4>Order ID: {order._id}</h4>
-            <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
+
+            {/* ✅ SAFE DATE */}
+            <p>
+              Date:{" "}
+              {order.createdAt
+                ? new Date(order.createdAt).toLocaleString()
+                : "N/A"}
+            </p>
 
             <h4>Items:</h4>
-            {order.items.map((item, index) => (
-              <div key={index} style={{ marginBottom: "10px" }}>
-                <img src={item.image} width="80" alt={item.name} />
-                <p>{item.name}</p>
-                <p>₹{item.price} × {item.quantity}</p>
-              </div>
-            ))}
+
+            {/* ✅ SAFE ITEMS CHECK */}
+            {Array.isArray(order.items) && order.items.length > 0 ? (
+              order.items.map((item, index) => (
+                <div key={index} style={{ marginBottom: "10px" }}>
+                  <img
+                    src={item.image}
+                    width="80"
+                    alt={item.name}
+                  />
+                  <p>{item.name}</p>
+                  <p>
+                    ₹{item.price} × {item.quantity}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No items</p>
+            )}
 
             <h3>Total: ₹{order.totalAmount}</h3>
           </div>

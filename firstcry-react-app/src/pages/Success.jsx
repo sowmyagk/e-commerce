@@ -3,9 +3,7 @@ import { useEffect } from "react";
 function Success() {
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-      method: "POST"
-    });
+    // ❌ REMOVE API CALL (VERY IMPORTANT)
   }, []);
 
   return (
