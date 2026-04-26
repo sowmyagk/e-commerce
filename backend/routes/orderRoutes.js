@@ -6,11 +6,11 @@ const Cart = require("../models/cart");
 // ✅ PLACE ORDER
 router.post("/", async (req, res) => {
   try {
-    const { userId, items, totalAmount } = req.body;
+    const { email, items, totalAmount } = req.body;
 
     // 🔒 VALIDATIONS
-    if (!userId) {
-      return res.status(400).json({ message: "User ID required" });
+    if (!email) {
+      return res.status(400).json({ message: "User email required" });
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -22,7 +22,7 @@ router.post("/", async (req, res) => {
     }
 
     const newOrder = new Order({
-      userId,
+      email,          // ✅ FIXED
       items,
       totalAmount
     });
@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
     await newOrder.save();
 
     // ✅ CLEAR CART
-    await Cart.deleteMany({ userId });
+    await Cart.deleteMany({ email });  // ✅ FIXED
 
     res.status(201).json({
       success: true,
@@ -45,16 +45,16 @@ router.post("/", async (req, res) => {
 });
 
 
-// ✅ GET ORDERS BY USER (IMPORTANT - KEEP ABOVE "/")
-router.get("/:userId", async (req, res) => {
+// ✅ GET ORDERS BY USER
+router.get("/:email", async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { email } = req.params;
 
-    if (!userId) {
-      return res.status(400).json({ message: "User ID required" });
+    if (!email) {
+      return res.status(400).json({ message: "User email required" });
     }
 
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    const orders = await Order.find({ email }).sort({ createdAt: -1 });
 
     res.json(orders);
 
@@ -65,7 +65,7 @@ router.get("/:userId", async (req, res) => {
 });
 
 
-// ✅ GET ALL ORDERS (KEEP LAST)
+// ✅ GET ALL ORDERS
 router.get("/", async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });

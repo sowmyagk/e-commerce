@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
-  userId: String, // ✅ ADD THIS
+  email: String,   // ✅ FIXED
+
   items: [
     {
       name: String,
@@ -11,7 +12,9 @@ const orderSchema = new mongoose.Schema({
       brand: String
     }
   ],
+
   totalAmount: Number,
+
   createdAt: {
     type: Date,
     default: Date.now
