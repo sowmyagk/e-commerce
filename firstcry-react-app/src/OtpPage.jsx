@@ -16,26 +16,52 @@ function OtpPage() {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+
+    // 🔥 auto focus next input
+    if (value && index < 5) {
+      const next = document.getElementById(`otp-${index + 1}`);
+      if (next) next.focus();
+    }
   };
 
   const handleVerify = async () => {
     const otpValue = otp.join("");
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, otp: otpValue })
-    });
+    if (otpValue.length !== 6) {
+      alert("Enter full OTP");
+      return;
+    }
 
-    const data = await res.json();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          otp: otpValue
+        })
+      });
 
-    if (data.success) {
-      localStorage.setItem("user", JSON.stringify({ value: email }));
-      navigate("/");
-    } else {
-      alert(data.message);
+      const data = await res.json();
+
+      if (data.success) {
+        // ✅ FIXED STORAGE
+        localStorage.setItem("user", JSON.stringify({
+          email: email
+        }));
+
+        alert("Login Successful");
+        navigate("/");
+
+      } else {
+        alert(data.message);
+      }
+
+    } catch (err) {
+      console.log(err);
+      alert("Verification error");
     }
   };
 
@@ -50,6 +76,7 @@ function OtpPage() {
           {otp.map((digit, index) => (
             <input
               key={index}
+              id={`otp-${index}`}
               maxLength="1"
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
