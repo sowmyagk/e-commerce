@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
+const sendEmailOTP = require("./utils/sendEmail");
+
+// Routes
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -13,7 +16,7 @@ const stripeRoutes = require("./routes/stripe");
 const app = express();
 
 
-// ✅ CORS (FIXED FOR PRODUCTION)
+// ✅ CORS
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -22,7 +25,7 @@ app.use(cors({
 app.use(express.json());
 
 
-// ✅ Cloudinary config
+// ✅ Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -30,7 +33,7 @@ cloudinary.config({
 });
 
 
-// ✅ MongoDB connection (FIXED ❗ REMOVE OLD OPTIONS)
+// ✅ MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB error:", err));
@@ -50,50 +53,60 @@ app.get("/", (req, res) => {
 });
 
 
-// ✅ OTP STORAGE (IMPROVED)
-const otpStore = {}; // store multiple users
+// ✅ OTP STORE (with expiry)
+const otpStore = {};
 
 
-// ✅ Send OTP
-app.post("/OTP", (req, res) => {
-  const { value } = req.body;
+// ✅ SEND OTP (EMAIL)
+app.post("/api/otp/send", async (req, res) => {
+  try {
+    const { email } = req.body;
 
-  if (!value) {
-    return res.json({ success: false, message: "Value required" });
+    if (!email) {
+      return res.json({ success: false, message: "Email required" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    otpStore[email] = {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000 // 5 min
+    };
+
+    // 🔥 SEND EMAIL HERE
+    await sendEmailOTP(email, otp);
+
+    res.json({ success: true, message: "OTP sent to email" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Error sending OTP" });
   }
-
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  otpStore[value] = otp;
-
-  res.json({ success: true, otp });
 });
 
 
-// ✅ Register + OTP
-app.post("/register", (req, res) => {
-  const { name, email, phone } = req.body;
+// ✅ VERIFY OTP
+app.post("/api/otp/verify", (req, res) => {
+  const { email, otp } = req.body;
 
-  if (!name || !email || !phone) {
-    return res.json({ success: false, message: "All fields required" });
+  if (!otpStore[email]) {
+    return res.json({ success: false, message: "OTP not found" });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  otpStore[email] = otp;
+  const stored = otpStore[email];
 
-  res.json({ success: true, otp });
-});
-
-
-// ✅ Verify OTP
-app.post("/verify-otp", (req, res) => {
-  const { value, otp } = req.body;
-
-  if (otpStore[value] === otp) {
-    delete otpStore[value];
-    return res.json({ success: true });
+  if (Date.now() > stored.expiresAt) {
+    delete otpStore[email];
+    return res.json({ success: false, message: "OTP expired" });
   }
 
-  res.json({ success: false, message: "Invalid OTP" });
+  if (stored.otp !== otp) {
+    return res.json({ success: false, message: "Invalid OTP" });
+  }
+
+  delete otpStore[email];
+
+  res.json({ success: true, message: "OTP verified" });
 });
 
 

@@ -1,89 +1,61 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./Login.css";
 
 function Login() {
-
   const navigate = useNavigate();
-  const [value, setValue] = useState("");
+  const [email, setEmail] = useState("");
 
   const handleLogin = async () => {
-
-    if (!value) {
-      alert("Please enter Email or Mobile");
+    if (!email) {
+      alert("Enter email");
       return;
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/OTP`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ value })
+        body: JSON.stringify({ email })
       });
 
       const data = await res.json();
 
       if (data.success) {
+        alert("OTP sent");
+
         navigate("/OtpPage", {
-          state: {
-            value: value,
-            otp: data.otp
-          }
+          state: { email }
         });
       } else {
-        alert("Failed to send OTP");
+        alert(data.message);
       }
 
-    } catch (error) {
-      console.log(error);
-      alert("Server error");
+    } catch (err) {
+      console.log(err);
+      alert("Error");
     }
   };
 
   return (
-    <div className="main-box">
+    <div>
+      <h2>Login</h2>
 
-      <div className="offer">
-        <img
-          src="https://cdn.fcglcdn.com/brainbees/images/m/login_revamp_banner_mobile.webp"
-          alt="offer"
-        />
-      </div>
-      <div className="login-box">
-        <h2>Log In / Register</h2>
+      <input
+        type="email"
+        placeholder="Enter Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <label>Email-Id or Mobile No*</label>
-        <input
-          type="text"
-          placeholder="Enter your Email-Id or Mobile No*"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
+      <button onClick={handleLogin}>
+        CONTINUE
+      </button>
 
-        <button className="btn" onClick={handleLogin}>
-          CONTINUE
-        </button>
-
-        <p className="register">
-          New user? <Link to="/register">Register Here</Link>
-        </p>
-
-        <p className="or">Or login with</p>
-
-        <div className="google-btn">
-          <img
-            src="https://img.icons8.com/color/20/google-logo.png"
-            alt="google"
-          />
-        </div>
-
-        <p className="terms">
-          By continuing, you agree to Terms of Use & Privacy Policy
-        </p>
-      </div>
-
+      <p>
+        New user? <Link to="/register">Register</Link>
+      </p>
     </div>
   );
 }

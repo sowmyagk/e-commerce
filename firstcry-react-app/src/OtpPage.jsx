@@ -2,31 +2,39 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function OtpPage() {
-
   const location = useLocation();
   const navigate = useNavigate();
 
   const [otpInput, setOtpInput] = useState("");
 
+  const email = location.state?.email;
+
   const handleVerify = async () => {
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ otp: otpInput })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        otp: otpInput
+      })
     });
 
     const data = await res.json();
 
     if (data.success) {
-        localStorage.setItem("user", JSON.stringify({
-    value: location.state?.value
-  }));
+
+      localStorage.setItem("user", JSON.stringify({
+        value: email
+      }));
 
       alert("Login Successful");
       navigate("/");
+
     } else {
-      alert("Invalid OTP");
+      alert(data.message);
     }
   };
 
@@ -34,8 +42,7 @@ function OtpPage() {
     <div>
       <h2>Enter OTP</h2>
 
-      <p>OTP sent to {location.state?.value}</p>
-      <p>Demo OTP: {location.state?.otp}</p>
+      <p>OTP sent to {email}</p>
 
       <input
         type="text"
@@ -44,7 +51,9 @@ function OtpPage() {
         onChange={(e) => setOtpInput(e.target.value)}
       />
 
-      <button onClick={handleVerify}>VERIFY OTP</button>
+      <button onClick={handleVerify}>
+        VERIFY OTP
+      </button>
     </div>
   );
 }
