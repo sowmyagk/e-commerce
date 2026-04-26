@@ -45,7 +45,7 @@ function Header() {
 
         {/* ✅ FIXED BUTTON */}
         <span className="login-link" onClick={handleAccount}>
-          My Account
+          Login/Register
         </span>
 
         <span onClick={() => navigate("/cart")}>Cart</span>
