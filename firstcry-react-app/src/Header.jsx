@@ -4,26 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [products, setProducts] = useState([]);
-  const [user, setUser] = useState(null);
-
   const navigate = useNavigate();
 
-  // ✅ GET USER (reactive)
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(storedUser);
-  }, []);
-
-  // ✅ HANDLE ACCOUNT CLICK
+  // ✅ ONLY NAVIGATE TO LOGIN
   const handleAccount = () => {
-    console.log("CLICKED");
-    console.log("USER:", user);
+    console.log("CLICK WORKING");
+    navigate("/login");
+  };
 
-  const handleAccount = () => {
-  navigate("/login");
-
-  }
-};
   // ✅ FETCH PRODUCTS
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/products`)
@@ -49,7 +37,7 @@ function Header() {
         <span>Support</span>
         <span>Track Order</span>
 
-        {/* ✅ FIXED LOGIN BUTTON */}
+        {/* ✅ LOGIN BUTTON */}
         <button className="login-link" onClick={handleAccount}>
           Login / Register
         </button>

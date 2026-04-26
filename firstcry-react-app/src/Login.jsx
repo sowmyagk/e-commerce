@@ -1,82 +1,49 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
+  const [input, setInput] = useState("");
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
 
-  const handleLogin = async () => {
-    if (!email) {
-      alert("Enter email");
-      return;
-    }
+  const handleContinue = async () => {
+    if (!input) return alert("Enter email or mobile");
 
-    try {
-      // 🔥 CHECK USER EXISTS
-      const checkRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/user/check`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        }
-      );
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/check-user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ input })
+    });
 
-      const checkData = await checkRes.json();
+    const data = await res.json();
 
-      if (!checkData.exists) {
-        // 👉 NEW USER → REGISTER PAGE
-        navigate("/register");
-        return;
-      }
-
-      // 👉 EXISTING USER → SEND OTP
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/otp/send`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-        navigate("/OtpPage", { state: { email } });
-      } else {
-        alert(data.message);
-      }
-    } catch (err) {
-      alert("Error");
+    if (data.exists) {
+      navigate("/otp", { state: { email: input } });
+    } else {
+      navigate("/register", { state: { email: input } });
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="login-container">
+      <h2>Log In / Register</h2>
 
-        <h2>Log In/Register</h2>
+      <input
+        placeholder="Enter your Email-Id or Mobile No."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
 
-        <label>Enter your Email</label>
+      <button onClick={handleContinue}>CONTINUE</button>
 
-        <input
-          type="email"
-          placeholder="Enter your Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <button onClick={handleLogin}>
-          CONTINUE
-        </button>
-
-        <p className="register-link">
-          New user? <Link to="/register">Register Here</Link>
-        </p>
-
-      </div>
+      <p>
+        New user?{" "}
+        <span onClick={() => navigate("/register")}>
+          Register Here
+        </span>
+      </p>
     </div>
   );
 }
