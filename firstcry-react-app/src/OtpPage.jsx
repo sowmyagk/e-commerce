@@ -12,56 +12,64 @@ function OtpPage() {
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
-  // ✅ Redirect if no email (important)
+  // ✅ Redirect if no email
   useEffect(() => {
     if (!email) {
       navigate("/login");
     }
   }, [email, navigate]);
 
+  // ✅ HANDLE CHANGE
   const handleChange = (value, index) => {
-    if (isNaN(value)) return;
+    if (!/^[0-9]?$/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // ✅ Auto move to next box
     if (value && index < 5) {
-      const next = document.getElementById(`otp-${index + 1}`);
-      if (next) next.focus();
+      document.getElementById(`otp-${index + 1}`).focus();
     }
   };
 
+  // ✅ HANDLE BACKSPACE
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`).focus();
+    }
+  };
+
+  // ✅ VERIFY OTP
   const handleVerify = async () => {
     const otpValue = otp.join("");
 
-    // ✅ Check full OTP
     if (otpValue.length !== 6) {
       alert("Enter complete OTP");
       return;
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          otp: otpValue,
-          name,
-          phone
-        })
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/otp/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            otp: otpValue,
+            name,
+            phone
+          })
+        }
+      );
 
       const data = await res.json();
 
       if (data.success) {
         localStorage.setItem("user", JSON.stringify({ email }));
 
-        alert("Login Successful ✅");
         navigate("/");
       } else {
         alert("Invalid OTP");
@@ -75,7 +83,6 @@ function OtpPage() {
   return (
     <div className="otp-container">
       <div className="otp-box">
-
         <h3>Verify your OTP</h3>
         <p>OTP sent to {email}</p>
 
@@ -87,14 +94,14 @@ function OtpPage() {
               maxLength="1"
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
             />
           ))}
         </div>
 
-        <button onClick={handleVerify}>
+        <button className="otp-btn" onClick={handleVerify}>
           VERIFY
         </button>
-
       </div>
     </div>
   );

@@ -9,6 +9,7 @@
   border: 1px solid #ddd;
   border-radius: 10px;
   text-align: center;
+  width: 350px;
 }
 
 .otp-inputs {
@@ -23,11 +24,17 @@
   height: 45px;
   text-align: center;
   font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-button {
+/* ✅ FIXED (scoped button) */
+.otp-btn {
   padding: 10px 20px;
   background: #ff6f00;
   color: white;
   border: none;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 5px;
 }
