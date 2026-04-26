@@ -1,25 +1,27 @@
-.checkout {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background: white;
+.checkout-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
 }
 
-.section {
-    margin-bottom: 20px;
+.checkout-container input,
+.checkout-container textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
 }
 
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
+.payment {
+  margin: 15px 0;
 }
 
-.order-btn {
-    width: 100%;
-    padding: 12px;
-    background: #fc2779;
-    color: white;
-    border: none;
-    cursor: pointer;
+button {
+  width: 100%;
+  padding: 12px;
+  background: crimson;
+  color: white;
+  border: none;
+  cursor: pointer;
 }

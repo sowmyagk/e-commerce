@@ -1,136 +1,75 @@
 import { useState } from "react";
-import "./Checkout.css";
 import { useNavigate } from "react-router-dom";
+import "./Checkout.css";
 
 function Checkout() {
-  const [address, setAddress] = useState({
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
     name: "",
     phone: "",
-    pincode: "",
     city: "",
-    addressLine: ""
+    pincode: "",
+    address: ""
   });
 
   const [payment, setPayment] = useState("cod");
-  const navigate = useNavigate();
+
+  // ✅ GET USER
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user || !user.email) {
+    alert("Please login first");
+    navigate("/login");
+  }
 
   const handleChange = (e) => {
-    setAddress({
-      ...address,
+    setForm({
+      ...form,
       [e.target.name]: e.target.value
     });
   };
 
   const handleOrder = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      // ✅ FIX: check _id
-      if (!user || !user._id) {
-        alert("Please login first");
-        return;
-      }
-
-      // ✅ GET CART
-      const cartRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/cart/${user._id}`
-      );
-      const cart = await cartRes.json();
-
-      if (!Array.isArray(cart) || cart.length === 0) {
-        alert("Cart is empty");
-        return;
-      }
-
-      // ✅ CALCULATE TOTAL
-      const totalPrice = cart.reduce((total, item) => {
-        return total + item.price * item.quantity;
-      }, 0);
-
-      // ✅ SAVE ADDRESS
-      await fetch(`${import.meta.env.VITE_API_URL}/api/address/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(address)
-      });
-
-      // ✅ PLACE ORDER (MAIN FIX)
-      await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          userId: user._id,
-          items: cart,
-          totalAmount: totalPrice
+          email: user.email,   // ✅ FIXED
+          ...form,
+          paymentMethod: payment
         })
       });
 
-      alert("Order placed successfully!");
-      navigate("/orders");
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Order placed successfully");
+        navigate("/orders");
+      } else {
+        alert(data.message);
+      }
 
     } catch (err) {
       console.log(err);
-      alert("Error placing order");
-    }
-  };
-
-  const handleConfirmOrder = async () => {
-    if (payment === "cod") {
-      handleOrder();
-    } else {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ address })
-          }
-        );
-
-        const data = await res.json();
-
-        if (!data.url) {
-          alert("Stripe URL not received");
-          return;
-        }
-
-        window.location.href = data.url;
-
-      } catch (err) {
-        console.log(err);
-        alert("Payment failed");
-      }
+      alert("Order failed");
     }
   };
 
   return (
-    <div className="checkout">
+    <div className="checkout-container">
       <h2>Checkout</h2>
 
-      <div className="section">
-        <h3>Delivery Address</h3>
+      <input name="name" placeholder="Name" onChange={handleChange} />
+      <input name="phone" placeholder="Phone" onChange={handleChange} />
+      <input name="city" placeholder="City" onChange={handleChange} />
+      <input name="pincode" placeholder="Pincode" onChange={handleChange} />
+      <textarea name="address" placeholder="Address" onChange={handleChange} />
 
-        <input name="name" placeholder="Full Name" onChange={handleChange} />
-        <input name="phone" placeholder="Phone Number" onChange={handleChange} />
-        <input name="city" placeholder="City" onChange={handleChange} />
-        <input name="pincode" placeholder="Pincode" onChange={handleChange} />
-        <textarea
-          name="addressLine"
-          placeholder="Full Address"
-          onChange={handleChange}
-        ></textarea>
-      </div>
-
-      <div className="section">
-        <h3>Payment Method</h3>
-
+      <div className="payment">
         <label>
           <input
             type="radio"
@@ -144,25 +83,14 @@ function Checkout() {
         <label>
           <input
             type="radio"
-            value="upi"
-            checked={payment === "upi"}
+            value="online"
             onChange={(e) => setPayment(e.target.value)}
           />
-          UPI
-        </label>
-
-        <label>
-          <input
-            type="radio"
-            value="card"
-            checked={payment === "card"}
-            onChange={(e) => setPayment(e.target.value)}
-          />
-          Card (Stripe)
+          Online Payment
         </label>
       </div>
 
-      <button className="order-btn" onClick={handleConfirmOrder}>
+      <button onClick={handleOrder}>
         Confirm Order
       </button>
     </div>
