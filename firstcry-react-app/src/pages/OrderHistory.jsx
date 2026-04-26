@@ -2,37 +2,39 @@ import React, { useEffect, useState } from "react";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-   
-    if (!user || !user.value) {
-      console.log("User not logged in");
+    if (!user) {
+      setLoading(false);
       return;
     }
 
-   
-    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${userId}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${user._id}`)
       .then(res => res.json())
       .then(data => {
-        console.log("ORDERS:", data);
-
         if (Array.isArray(data)) {
           setOrders(data);
         } else {
-          console.log("Not an array:", data);
-          setOrders([]);
+          console.log("Unexpected response:", data);
         }
+        setLoading(false);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.error("Error fetching orders:", err);
+        setLoading(false);
+      });
   }, []);
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>My Orders</h2>
 
-      {orders.length === 0 ? (
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : orders.length === 0 ? (
         <h3>No orders found</h3>
       ) : (
         orders.map(order => (
@@ -46,7 +48,6 @@ function OrderHistory() {
           >
             <h4>Order ID: {order._id}</h4>
 
-            {/* ✅ SAFE DATE */}
             <p>
               Date:{" "}
               {order.createdAt
@@ -56,15 +57,10 @@ function OrderHistory() {
 
             <h4>Items:</h4>
 
-            {/* ✅ SAFE ITEMS CHECK */}
             {Array.isArray(order.items) && order.items.length > 0 ? (
               order.items.map((item, index) => (
                 <div key={index} style={{ marginBottom: "10px" }}>
-                  <img
-                    src={item.image}
-                    width="80"
-                    alt={item.name}
-                  />
+                  <img src={item.image} width="80" alt={item.name} />
                   <p>{item.name}</p>
                   <p>
                     ₹{item.price} × {item.quantity}
