@@ -19,13 +19,11 @@ function Header() {
     console.log("CLICKED");
     console.log("USER:", user);
 
-    if (user) {
-      navigate("/orders");
-    } else {
-      navigate("/login");
-    }
-  };
+  const handleAccount = () => {
+  navigate("/login");
 
+  }
+};
   // ✅ FETCH PRODUCTS
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/products`)
