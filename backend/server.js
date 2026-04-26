@@ -49,64 +49,116 @@ app.use("/api/payment", stripeRoutes);
 
 // ✅ Test route
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.status(200).send("API is running...");
 });
 
 
-// ✅ OTP STORE (with expiry)
+// ✅ OTP STORE
 const otpStore = {};
 
 
-// ✅ SEND OTP (EMAIL)
+// ✅ EMAIL VALIDATION FUNCTION
+const isValidEmail = (email) => {
+  return /\S+@\S+\.\S+/.test(email);
+};
+
+
+// ✅ SEND OTP
 app.post("/api/otp/send", async (req, res) => {
   try {
     const { email } = req.body;
 
     if (!email) {
-      return res.json({ success: false, message: "Email required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email required"
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format"
+      });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     otpStore[email] = {
       otp,
-      expiresAt: Date.now() + 5 * 60 * 1000 // 5 min
+      expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
     };
 
-    // 🔥 SEND EMAIL HERE
+    // ✅ SEND EMAIL
     await sendEmailOTP(email, otp);
 
-    res.json({ success: true, message: "OTP sent to email" });
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully"
+    });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Error sending OTP" });
+    console.log("OTP SEND ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send OTP"
+    });
   }
 });
 
 
 // ✅ VERIFY OTP
 app.post("/api/otp/verify", (req, res) => {
-  const { email, otp } = req.body;
+  try {
+    const { email, otp } = req.body;
 
-  if (!otpStore[email]) {
-    return res.json({ success: false, message: "OTP not found" });
-  }
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and OTP required"
+      });
+    }
 
-  const stored = otpStore[email];
+    const record = otpStore[email];
 
-  if (Date.now() > stored.expiresAt) {
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP not found"
+      });
+    }
+
+    if (Date.now() > record.expiresAt) {
+      delete otpStore[email];
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired"
+      });
+    }
+
+    if (record.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP"
+      });
+    }
+
     delete otpStore[email];
-    return res.json({ success: false, message: "OTP expired" });
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified successfully"
+    });
+
+  } catch (err) {
+    console.log("VERIFY ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
-
-  if (stored.otp !== otp) {
-    return res.json({ success: false, message: "Invalid OTP" });
-  }
-
-  delete otpStore[email];
-
-  res.json({ success: true, message: "OTP verified" });
 });
 
 
