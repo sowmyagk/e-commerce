@@ -11,6 +11,7 @@ function AddProduct() {
   const [brand, setBrand] = useState("");
   const [productdescription, setProductDescription] = useState("");
   const [image, setImage] = useState(null);
+  const [existingImage, setExistingImage] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -24,6 +25,7 @@ function AddProduct() {
             setPrice(product.price);
             setBrand(product.brand);
             setProductDescription(product.productdescription);
+            setExistingImage(product.image); // ✅ already correct
           }
         });
     }
@@ -110,6 +112,16 @@ function AddProduct() {
             value={productdescription}
             onChange={(e) => setProductDescription(e.target.value)}
           />
+
+          {/* ✅ SHOW EXISTING IMAGE (EDIT MODE ONLY) */}
+          {id && existingImage && (
+            <img
+              src={`${import.meta.env.VITE_API_URL}/${existingImage}`}
+              width="120"
+              style={{ marginBottom: "10px" }}
+              alt="product"
+            />
+          )}
 
           {!id && (
             <input

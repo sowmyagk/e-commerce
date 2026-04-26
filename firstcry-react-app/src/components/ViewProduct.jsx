@@ -32,45 +32,50 @@ function ViewProduct() {
     <div className="container">
       <h2 className="title">Products</h2>
 
-      {products.map((item) => (
-        <div key={item._id} className="product-row">
+      {products.map((item) => {
+        
+        // ✅ ADD THIS LINE HERE
+        console.log(item.image);
 
-         <img
-           src={`${import.meta.env.VITE_API_URL}/${item.image}`}
-           alt="product"
-            className="product-img"
-          />
-          
+        return (
+          <div key={item._id} className="product-row">
 
-          {/* NAME */}
-          <span className="product-name">
-            {item.name}
-          </span>
+            <img
+              src={`${import.meta.env.VITE_API_URL}/${item.image}`}
+              alt="product"
+              className="product-img"
+            />
 
-          {/* PRICE */}
-          <span className="product-price">
-            ₹{item.price}
-          </span>
+            {/* NAME */}
+            <span className="product-name">
+              {item.name}
+            </span>
 
-          {/* ACTIONS */}
-          <div className="actions">
-            <button
-              className="edit-btn"
-              onClick={() => navigate(`/edit-product/${item._id}`)}
-            >
-              Edit
-            </button>
+            {/* PRICE */}
+            <span className="product-price">
+              ₹{item.price}
+            </span>
 
-            <button
-              className="delete-btn"
-              onClick={() => handleDelete(item._id)}
-            >
-              Delete
-            </button>
+            {/* ACTIONS */}
+            <div className="actions">
+              <button
+                className="edit-btn"
+                onClick={() => navigate(`/edit-product/${item._id}`)}
+              >
+                Edit
+              </button>
+
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(item._id)}
+              >
+                Delete
+              </button>
+            </div>
+
           </div>
-
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
