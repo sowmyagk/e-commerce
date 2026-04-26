@@ -13,11 +13,10 @@ const stripeRoutes = require("./routes/stripe");
 const app = express();
 
 
-// ✅ CORS (IMPORTANT FIX)
+// ✅ CORS (FIXED FOR PRODUCTION)
 app.use(cors({
-  origin: "*", // or your frontend URL
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
 }));
 
 app.use(express.json());
@@ -31,13 +30,10 @@ cloudinary.config({
 });
 
 
-// ✅ MongoDB connection (IMPROVED)
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB connected"))
-.catch(err => console.error("❌ MongoDB error:", err));
+// ✅ MongoDB connection (FIXED ❗ REMOVE OLD OPTIONS)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error("❌ MongoDB error:", err));
 
 
 // ✅ Routes
@@ -54,8 +50,8 @@ app.get("/", (req, res) => {
 });
 
 
-// ✅ OTP STORAGE FIX (use object instead of single variable)
-const otpStore = {}; // { email/phone : otp }
+// ✅ OTP STORAGE (IMPROVED)
+const otpStore = {}; // store multiple users
 
 
 // ✅ Send OTP
@@ -93,7 +89,7 @@ app.post("/verify-otp", (req, res) => {
   const { value, otp } = req.body;
 
   if (otpStore[value] === otp) {
-    delete otpStore[value]; // remove after success
+    delete otpStore[value];
     return res.json({ success: true });
   }
 
@@ -101,12 +97,12 @@ app.post("/verify-otp", (req, res) => {
 });
 
 
-// ✅ GLOBAL ERROR HANDLER (VERY IMPORTANT)
+// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
-    message: "Something went wrong"
+    message: "Something went wrong",
   });
 });
 
