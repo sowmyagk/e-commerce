@@ -1,28 +1,24 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
 const Product = require("../models/Product");
 
 const router = express.Router();
 
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
+// ✅ Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "products",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
   },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
 });
 
 const upload = multer({ storage });
 
+// ✅ ADD PRODUCT
 router.post("/add-product", upload.single("image"), async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -36,7 +32,7 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
       price,
       brand,
       productdescription,
-      image: req.file.filename
+      image: req.file.path // ✅ CLOUDINARY URL
     });
 
     await product.save();
@@ -44,34 +40,22 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.error("ADD PRODUCT ERROR:", error);
+    console.error(error);
     res.status(500).json({ success: false });
   }
 });
 
+// ✅ GET PRODUCTS
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
-
-    const result = products.map(p => ({
-      _id: p._id,
-      name: p.name,
-      price: p.price,
-      brand: p.brand,
-      productdescription: p.productdescription,
-      image: p.image
-        ? `${req.protocol}://${req.get("host")}/uploads/${p.image}`
-        : null
-    }));
-
-    res.json(result);
-
+    res.json(products); // ✅ DIRECT (image already full URL)
   } catch (error) {
-    console.error("GET PRODUCTS ERROR:", error);
     res.status(500).json({ message: "Error fetching products" });
   }
 });
 
+// ✅ UPDATE
 router.put("/update-product/:id", async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -86,31 +70,16 @@ router.put("/update-product/:id", async (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.error("UPDATE ERROR:", error);
     res.status(500).json({ success: false });
   }
 });
 
+// ✅ DELETE
 router.delete("/remove-product/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) return res.json({ success: false });
-
-    if (product.image) {
-      const imagePath = path.join(__dirname, "..", "uploads", product.image);
-
-      fs.unlink(imagePath, (err) => {
-        if (err) console.log("Image delete error:", err);
-      });
-    }
-
     await Product.findByIdAndDelete(req.params.id);
-
     res.json({ success: true });
-
   } catch (error) {
-    console.error("DELETE ERROR:", error);
     res.status(500).json({ success: false });
   }
 });
