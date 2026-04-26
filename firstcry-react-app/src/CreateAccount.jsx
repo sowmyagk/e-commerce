@@ -29,8 +29,6 @@ function CreateAccount() {
       const data = await res.json();
 
       if (data.success) {
-        alert("OTP sent to email");
-
         navigate("/OtpPage", {
           state: { email }
         });
@@ -46,36 +44,54 @@ function CreateAccount() {
 
   return (
     <div className="register-page">
+
       <div className="register-card">
 
-        <h2>Register</h2>
+        {/* HEADER */}
+        <h2 className="title">Register</h2>
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        {/* FORM */}
+        <form onSubmit={handleOtp}>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <label>Full Name *</label>
+          <input
+            type="text"
+            placeholder="Full Name *"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-        <input
-          type="text"
-          placeholder="Mobile"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+          <label>Email Id *</label>
+          <input
+            type="email"
+            placeholder="Email Id *"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <button onClick={handleOtp}>
-          GET OTP
-        </button>
+          <label>Your Mobile No. *</label>
+          <div className="phone-box">
+            <span className="country">🇮🇳 +91</span>
+            <input
+              type="text"
+              placeholder="Your Mobile No *"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <p className="otp-info">
+            OTP will be sent on this mobile no for verification
+          </p>
+
+          <button type="submit">
+            GET OTP
+          </button>
+
+        </form>
 
       </div>
+
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -23,39 +24,39 @@ function Login() {
       const data = await res.json();
 
       if (data.success) {
-        alert("OTP sent");
-
-        navigate("/OtpPage", {
-          state: { email }
-        });
+        navigate("/OtpPage", { state: { email } });
       } else {
         alert(data.message);
       }
-
     } catch (err) {
-      console.log(err);
       alert("Error");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="auth-container">
+      <div className="auth-card">
 
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <h2>Log In/Register</h2>
 
-      <button onClick={handleLogin}>
-        CONTINUE
-      </button>
+        <label>Enter your Email</label>
 
-      <p>
-        New user? <Link to="/register">Register</Link>
-      </p>
+        <input
+          type="email"
+          placeholder="Enter your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <button onClick={handleLogin}>
+          CONTINUE
+        </button>
+
+        <p className="register-link">
+          New user? <Link to="/register">Register Here</Link>
+        </p>
+
+      </div>
     </div>
   );
 }
