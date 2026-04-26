@@ -4,31 +4,39 @@ import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [products, setProducts] = useState([]);
+  const [user, setUser] = useState(null);
+
   const navigate = useNavigate();
 
-  // ✅ CHECK USER
-  const user = JSON.parse(localStorage.getItem("user"));
+  // ✅ GET USER (reactive)
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setUser(storedUser);
+  }, []);
 
   // ✅ HANDLE ACCOUNT CLICK
   const handleAccount = () => {
+    console.log("CLICKED");
+    console.log("USER:", user);
+
     if (user) {
-      navigate("/orders"); // change if you want profile page
+      navigate("/orders");
     } else {
       navigate("/login");
     }
   };
 
+  // ✅ FETCH PRODUCTS
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/products`)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error("API failed");
         return res.json();
       })
-      .then(data => {
-        // ✅ FIX: ensure array
+      .then((data) => {
         setProducts(Array.isArray(data) ? data : []);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("API ERROR:", err);
         setProducts([]);
       });
@@ -43,16 +51,16 @@ function Header() {
         <span>Support</span>
         <span>Track Order</span>
 
-        {/* ✅ FIXED BUTTON */}
-        <span className="login-link" onClick={handleAccount}>
-          Login/Register
-        </span>
+        {/* ✅ FIXED LOGIN BUTTON */}
+        <button className="login-link" onClick={handleAccount}>
+          Login / Register
+        </button>
 
         <span onClick={() => navigate("/cart")}>Cart</span>
         <span onClick={() => navigate("/wishlist")}>Wishlist</span>
       </div>
 
-      {/* MENU */}
+      {/* 🔥 MENU */}
       <nav className="menu">
         <a>ALL CATEGORIES</a>
         <a>BOY FASHION</a>
@@ -67,20 +75,21 @@ function Header() {
         <a>MOMS</a>
       </nav>
 
-      {/* HEADER */}
+      {/* 🔥 HEADER */}
       <header className="header">
         <div className="logo">firstcry</div>
+
         <div className="search">
           <input placeholder="Search for a Category, Brand or Product" />
         </div>
       </header>
 
-      {/* BANNER */}
+      {/* 🔥 BANNER */}
       <section className="banner-new">
         <img src="https://miniklub.in/cdn/shop/files/SS_26_Desktop-Banner.jpg?v=1768308772&width=1920" />
       </section>
 
-      {/* PREMIUM */}
+      {/* 🔥 PREMIUM */}
       <section className="premium">
         <h2>PREMIUM BOUTIQUES</h2>
 
@@ -100,12 +109,12 @@ function Header() {
         </div>
       </section>
 
-      {/* BANNER */}
+      {/* 🔥 SECOND BANNER */}
       <section className="banner-new">
         <img src="https://cdn.fcglcdn.com/brainbees/banners/desktop_baby_growth_&_development1774849772013.webp" />
       </section>
 
-      {/* SEASONAL */}
+      {/* 🔥 SEASONAL */}
       <section className="seasonal">
         <h2>Seasonal STAPLES</h2>
         <p>Effortless styles endless options</p>
@@ -120,7 +129,7 @@ function Header() {
         </div>
       </section>
 
-      {/* PRODUCTS */}
+      {/* 🔥 PRODUCTS */}
       <section className="admin-products">
         <h2 className="admin-title">Our Products</h2>
 
@@ -131,7 +140,7 @@ function Header() {
               className="admin-product-card"
               onClick={() => navigate(`/product/${item._id}`)}
             >
-              <img src={item.image} />
+              <img src={item.image} alt={item.name} />
               <h4>{item.name}</h4>
               <p>₹{item.price}</p>
             </div>

@@ -18,19 +18,23 @@ import Success from "./pages/Success";
 function App() {
   return (
     <>
-      <Header />
-
       <Routes>
+        {/* ✅ HOME */}
+        <Route path="/" element={<Header />} />
+
+        {/* ✅ USER AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<CreateAccount />} />
         <Route path="/OtpPage" element={<OtpPage />} />
 
+        {/* ✅ ADMIN */}
         <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/viewproduct" element={<ViewProduct />} />
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path="/edit-product/:id" element={<AddProduct />} />
 
+        {/* ✅ USER FEATURES */}
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/product/:id" element={<ProductDetails />} />
