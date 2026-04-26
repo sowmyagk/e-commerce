@@ -3,7 +3,7 @@ import { useEffect } from "react";
 function Success() {
 
   useEffect(() => {
-    // ❌ REMOVE API CALL (VERY IMPORTANT)
+  
   }, []);
 
   return (

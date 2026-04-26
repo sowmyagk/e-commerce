@@ -25,14 +25,15 @@ function Checkout() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      if (!user || !user.value) {
+      // ✅ FIX: check _id
+      if (!user || !user._id) {
         alert("Please login first");
         return;
       }
 
-  
+      // ✅ GET CART
       const cartRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/cart/${user.value}`
+        `${import.meta.env.VITE_API_URL}/api/cart/${user._id}`
       );
       const cart = await cartRes.json();
 
@@ -41,11 +42,12 @@ function Checkout() {
         return;
       }
 
+      // ✅ CALCULATE TOTAL
       const totalPrice = cart.reduce((total, item) => {
         return total + item.price * item.quantity;
       }, 0);
 
-     
+      // ✅ SAVE ADDRESS
       await fetch(`${import.meta.env.VITE_API_URL}/api/address/add`, {
         method: "POST",
         headers: {
@@ -54,21 +56,20 @@ function Checkout() {
         body: JSON.stringify(address)
       });
 
-     
- 
-
+      // ✅ PLACE ORDER (MAIN FIX)
       await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    userId: user.value
-  })
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          items: cart,
+          totalAmount: totalPrice
+        })
+      });
 
       alert("Order placed successfully!");
-
       navigate("/orders");
 
     } catch (err) {
