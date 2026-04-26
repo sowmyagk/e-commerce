@@ -16,10 +16,11 @@ const stripeRoutes = require("./routes/stripe");
 const app = express();
 
 
-// ✅ CORS
+// ✅ CORS (better config)
 app.use(cors({
-  origin: "*",
+  origin: "*", // later you can restrict frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 app.use(express.json());
@@ -33,10 +34,13 @@ cloudinary.config({
 });
 
 
-// ✅ MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ MongoDB error:", err));
+// ✅ MongoDB (better options)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ MongoDB connected"))
+.catch(err => console.error("❌ MongoDB error:", err));
 
 
 // ✅ Routes
@@ -57,7 +61,7 @@ app.get("/", (req, res) => {
 const otpStore = {};
 
 
-// ✅ EMAIL VALIDATION FUNCTION
+// ✅ EMAIL VALIDATION
 const isValidEmail = (email) => {
   return /\S+@\S+\.\S+/.test(email);
 };
@@ -86,13 +90,12 @@ app.post("/api/otp/send", async (req, res) => {
 
     otpStore[email] = {
       otp,
-      expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+      expiresAt: Date.now() + 5 * 60 * 1000
     };
 
-    // ✅ SEND EMAIL
     await sendEmailOTP(email, otp);
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "OTP sent successfully"
     });
@@ -100,7 +103,7 @@ app.post("/api/otp/send", async (req, res) => {
   } catch (err) {
     console.log("OTP SEND ERROR:", err);
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Failed to send OTP"
     });
@@ -146,7 +149,7 @@ app.post("/api/otp/verify", (req, res) => {
 
     delete otpStore[email];
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "OTP verified successfully"
     });
@@ -154,7 +157,7 @@ app.post("/api/otp/verify", (req, res) => {
   } catch (err) {
     console.log("VERIFY ERROR:", err);
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Server error"
     });
@@ -164,7 +167,7 @@ app.post("/api/otp/verify", (req, res) => {
 
 // ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("GLOBAL ERROR:", err.stack);
   res.status(500).json({
     success: false,
     message: "Something went wrong",
