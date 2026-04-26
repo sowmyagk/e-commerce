@@ -4,7 +4,7 @@ function OrderHistory() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = localStorage.getItem("userId");
 
    
     if (!user || !user.value) {
@@ -13,7 +13,7 @@ function OrderHistory() {
     }
 
    
-    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${user.value}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${userId}`)
       .then(res => res.json())
       .then(data => {
         console.log("ORDERS:", data);
