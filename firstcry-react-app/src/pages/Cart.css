@@ -1,0 +1,85 @@
+.cart-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.cart-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.empty {
+  text-align: center;
+  color: gray;
+}
+
+.cart-item {
+  display: flex;
+  gap: 20px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: #fff;
+}
+
+.cart-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.details {
+  flex: 1;
+}
+
+.qty {
+  margin: 10px 0;
+}
+
+.qty button {
+  padding: 5px 10px;
+  font-size: 16px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.remove {
+  background: red;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.total {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.checkout {
+  width: 100%;
+  padding: 10px;
+  background: green;
+  color: white;
+  border: none;
+  font-size: 16px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.orders {
+  width: 100%;
+  padding: 10px;
+  background: #333;
+  color: white;
+  border: none;
+  font-size: 16px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
