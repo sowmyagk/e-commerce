@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
 
   role:{
   type:String,
-  defaut:"user"
+  default: "user"
   }
 
 })

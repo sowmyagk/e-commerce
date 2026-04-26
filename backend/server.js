@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
 const cloudinary = require("cloudinary").v2;
 
 const productRoutes = require("./routes/productRoutes");
@@ -13,6 +12,17 @@ const stripeRoutes = require("./routes/stripe");
 
 const app = express();
 
+
+// ✅ CORS (IMPORTANT FIX)
+app.use(cors({
+  origin: "*", // or your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+app.use(express.json());
+
+
 // ✅ Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -20,16 +30,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(cors());
-app.use(express.json());
 
-// ❌ REMOVE this (not needed anymore)
-// app.use("/uploads", express.static("uploads"));
+// ✅ MongoDB connection (IMPROVED)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB connected"))
+.catch(err => console.error("❌ MongoDB error:", err));
 
-// ✅ MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
 
 // ✅ Routes
 app.use("/api/products", productRoutes);
@@ -38,46 +47,71 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/payment", stripeRoutes);
 
+
+// ✅ Test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// OTP APIs (same as yours)
-let generatedOtp = "";
 
+// ✅ OTP STORAGE FIX (use object instead of single variable)
+const otpStore = {}; // { email/phone : otp }
+
+
+// ✅ Send OTP
 app.post("/OTP", (req, res) => {
   const { value } = req.body;
 
   if (!value) {
-    return res.json({ success: false });
+    return res.json({ success: false, message: "Value required" });
   }
 
-  generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-  res.json({ success: true, otp: generatedOtp });
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  otpStore[value] = otp;
+
+  res.json({ success: true, otp });
 });
 
+
+// ✅ Register + OTP
 app.post("/register", (req, res) => {
   const { name, email, phone } = req.body;
 
   if (!name || !email || !phone) {
-    return res.json({ success: false });
+    return res.json({ success: false, message: "All fields required" });
   }
 
-  generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-  res.json({ success: true, otp: generatedOtp });
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  otpStore[email] = otp;
+
+  res.json({ success: true, otp });
 });
 
+
+// ✅ Verify OTP
 app.post("/verify-otp", (req, res) => {
-  const { otp } = req.body;
+  const { value, otp } = req.body;
 
-  if (otp === generatedOtp) {
-    res.json({ success: true });
-  } else {
-    res.json({ success: false });
+  if (otpStore[value] === otp) {
+    delete otpStore[value]; // remove after success
+    return res.json({ success: true });
   }
+
+  res.json({ success: false, message: "Invalid OTP" });
 });
+
+
+// ✅ GLOBAL ERROR HANDLER (VERY IMPORTANT)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Something went wrong"
+  });
+});
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
