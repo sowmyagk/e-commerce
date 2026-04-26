@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./OtpPage.css";
 
 function OtpPage() {
   const location = useLocation();
@@ -16,79 +15,49 @@ function OtpPage() {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // 🔥 auto focus next input
-    if (value && index < 5) {
-      const next = document.getElementById(`otp-${index + 1}`);
-      if (next) next.focus();
-    }
   };
 
   const handleVerify = async () => {
     const otpValue = otp.join("");
 
-    if (otpValue.length !== 6) {
-      alert("Enter full OTP");
-      return;
-    }
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        otp: otpValue,
+        name: location.state?.name,
+        phone: location.state?.phone
+      })
+    });
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          otp: otpValue
-        })
-      });
+    const data = await res.json();
 
-      const data = await res.json();
+    if (data.success) {
+      localStorage.setItem("user", JSON.stringify({ email }));
 
-      if (data.success) {
-        // ✅ FIXED STORAGE
-        localStorage.setItem("user", JSON.stringify({
-          email: email
-        }));
-
-        alert("Login Successful");
-        navigate("/");
-
-      } else {
-        alert(data.message);
-      }
-
-    } catch (err) {
-      console.log(err);
-      alert("Verification error");
+      navigate("/");
+    } else {
+      alert("Invalid OTP");
     }
   };
 
   return (
-    <div className="otp-container">
-      <div className="otp-box">
+    <div>
+      <h3>Enter OTP</h3>
 
-        <h3>Verify your OTP</h3>
-        <p>OTP sent to {email}</p>
+      {otp.map((d, i) => (
+        <input
+          key={i}
+          maxLength="1"
+          value={d}
+          onChange={(e) => handleChange(e.target.value, i)}
+        />
+      ))}
 
-        <div className="otp-inputs">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              id={`otp-${index}`}
-              maxLength="1"
-              value={digit}
-              onChange={(e) => handleChange(e.target.value, index)}
-            />
-          ))}
-        </div>
-
-        <button onClick={handleVerify}>
-          SUBMIT
-        </button>
-
-      </div>
+      <button onClick={handleVerify}>Verify</button>
     </div>
   );
 }

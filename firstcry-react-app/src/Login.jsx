@@ -1,19 +1,18 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
-  const handleLogin = async () => {
+  const handleContinue = async () => {
     if (!email) {
       alert("Enter email");
       return;
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/check`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -23,40 +22,33 @@ function Login() {
 
       const data = await res.json();
 
-      if (data.success) {
+      if (data.exists) {
+        // 👉 EXISTING USER → OTP LOGIN
         navigate("/OtpPage", { state: { email } });
       } else {
-        alert(data.message);
+        // 👉 NEW USER → REGISTER
+        navigate("/register", { state: { email } });
       }
+
     } catch (err) {
       alert("Error");
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div>
+      <h2>Login</h2>
 
-        <h2>Log In/Register</h2>
+      <input
+        type="email"
+        placeholder="Enter Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <label>Enter your Email</label>
-
-        <input
-          type="email"
-          placeholder="Enter your Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <button onClick={handleLogin}>
-          CONTINUE
-        </button>
-
-        <p className="register-link">
-          New user? <Link to="/register">Register Here</Link>
-        </p>
-
-      </div>
+      <button onClick={handleContinue}>
+        CONTINUE
+      </button>
     </div>
   );
 }
