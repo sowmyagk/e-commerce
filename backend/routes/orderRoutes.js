@@ -3,33 +3,29 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
-/* ✅ CREATE ORDER */
+
 router.post("/", async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId, items, totalAmount } = req.body;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID required" });
     }
 
-    const cartItems = await Cart.find({ userId });
-
-    if (cartItems.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
+    // ✅ USE ITEMS FROM FRONTEND
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "No items provided" });
     }
-
-    const totalAmount = cartItems.reduce((total, item) => {
-      return total + item.price * item.quantity;
-    }, 0);
 
     const newOrder = new Order({
       userId,
-      items: cartItems,
+      items,
       totalAmount
     });
 
     await newOrder.save();
 
+    // ✅ clear cart AFTER saving
     await Cart.deleteMany({ userId });
 
     res.json({ message: "Order placed successfully", order: newOrder });
