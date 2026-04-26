@@ -1,22 +1,20 @@
 .otp-container {
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-top: 80px;
 }
 
 .otp-box {
-  background: white;
   padding: 30px;
+  border: 1px solid #ddd;
   border-radius: 10px;
-  width: 400px;
   text-align: center;
 }
 
 .otp-inputs {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
+  justify-content: center;
   margin: 20px 0;
 }
 
@@ -25,21 +23,11 @@
   height: 45px;
   text-align: center;
   font-size: 18px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
-.otp-box button {
-  width: 100%;
-  padding: 12px;
-  background: #ff6f3c;
-  border: none;
+button {
+  padding: 10px 20px;
+  background: #ff6f00;
   color: white;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.otp-box button:hover {
-  background: #e65c2e;
+  border: none;
 }

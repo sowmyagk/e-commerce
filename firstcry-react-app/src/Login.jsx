@@ -1,54 +1,82 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
-  const handleContinue = async () => {
+  const handleLogin = async () => {
     if (!email) {
       alert("Enter email");
       return;
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/check`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email })
-      });
+      // 🔥 CHECK USER EXISTS
+      const checkRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/user/check`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        }
+      );
+
+      const checkData = await checkRes.json();
+
+      if (!checkData.exists) {
+        // 👉 NEW USER → REGISTER PAGE
+        navigate("/register");
+        return;
+      }
+
+      // 👉 EXISTING USER → SEND OTP
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/otp/send`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        }
+      );
 
       const data = await res.json();
 
-      if (data.exists) {
-        // 👉 EXISTING USER → OTP LOGIN
+      if (data.success) {
         navigate("/OtpPage", { state: { email } });
       } else {
-        // 👉 NEW USER → REGISTER
-        navigate("/register", { state: { email } });
+        alert(data.message);
       }
-
     } catch (err) {
       alert("Error");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="auth-container">
+      <div className="auth-card">
 
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <h2>Log In/Register</h2>
 
-      <button onClick={handleContinue}>
-        CONTINUE
-      </button>
+        <label>Enter your Email</label>
+
+        <input
+          type="email"
+          placeholder="Enter your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <button onClick={handleLogin}>
+          CONTINUE
+        </button>
+
+        <p className="register-link">
+          New user? <Link to="/register">Register Here</Link>
+        </p>
+
+      </div>
     </div>
   );
 }
