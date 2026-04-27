@@ -1,40 +1,22 @@
 .otp-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 80px;
-}
-
-.otp-box {
-  padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  text-align: center;
   width: 350px;
-}
-
-.otp-inputs {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.otp-inputs input {
-  width: 45px;
-  height: 45px;
+  margin: auto;
+  margin-top: 120px;
   text-align: center;
-  font-size: 18px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
-/* ✅ FIXED (scoped button) */
-.otp-btn {
-  padding: 10px 20px;
+.otp-container input {
+  width: 200px;
+  padding: 12px;
+  text-align: center;
+  letter-spacing: 5px;
+  font-size: 18px;
+}
+
+.otp-container button {
+  margin-top: 20px;
+  padding: 12px;
+  width: 100%;
   background: #ff6f00;
   color: white;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-  border-radius: 5px;
 }

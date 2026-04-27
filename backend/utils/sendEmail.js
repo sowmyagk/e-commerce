@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmailOTP = async (email, otp) => {
+const sendEmail = async (to, otp) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -9,19 +9,12 @@ const sendEmailOTP = async (email, otp) => {
     },
   });
 
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "OTP Verification",
-      text: `Your OTP is ${otp}`,
-    });
-
-    console.log("✅ OTP Email Sent");
-  } catch (err) {
-    console.log("❌ EMAIL ERROR:", err);
-    throw err;
-  }
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to,
+    subject: "Your OTP Code",
+    text: `Your OTP is ${otp}`,
+  });
 };
 
-module.exports = sendEmailOTP;
+module.exports = sendEmail;

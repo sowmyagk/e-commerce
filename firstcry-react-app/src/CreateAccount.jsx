@@ -1,60 +1,47 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import "./CreateAccount.css";
+import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function CreateAccount() {
-  const navigate = useNavigate();
+export default function CreateAccount() {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState(location.state?.email || "");
-  const [phone, setPhone] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    mobile: location.state?.input || "",
+  });
 
-  const handleOtp = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email })
+  const handleRegister = async () => {
+    await axios.post("http://localhost:3001/api/register", form);
+
+    await axios.post("http://localhost:3001/api/send-otp", {
+      input: form.mobile,
     });
 
-    const data = await res.json();
-
-    if (data.success) {
-      navigate("/otp", {
-        state: { email, name, phone }
-      });
-    } else {
-      alert("OTP failed");
-    }
+    navigate("/otp", { state: { input: form.mobile } });
   };
 
   return (
     <div className="register-container">
-      <h2>Register</h2>
+      <h2>Create Account</h2>
 
       <input
         placeholder="Full Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
-
       <input
-        placeholder="Email Id"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
-
       <input
-        placeholder="Mobile Number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        placeholder="Mobile"
+        value={form.mobile}
+        onChange={(e) => setForm({ ...form, mobile: e.target.value })}
       />
 
-      <button onClick={handleOtp}>GET OTP</button>
+      <button onClick={handleRegister}>GET OTP</button>
     </div>
   );
 }
-
-export default CreateAccount;
