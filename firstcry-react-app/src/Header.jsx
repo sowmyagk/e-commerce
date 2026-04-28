@@ -1,52 +1,44 @@
 import { useEffect, useState } from "react";
 import "./Header.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ ONLY NAVIGATE TO LOGIN
-  const handleAccount = () => {
-    console.log("CLICK WORKING");
-    navigate("/login");
-  };
+ 
 
-  // ✅ FETCH PRODUCTS
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API failed");
-        return res.json();
-      })
-      .then((data) => {
-        setProducts(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => {
-        console.log("API ERROR:", err);
-        setProducts([]);
-      });
-  }, []);
+
+
+ useEffect(() => {
+  fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("API failed");
+      }
+      return res.json();
+    })
+    .then(data => setProducts(data))
+    .catch(err => {
+      console.log("API ERROR:", err);
+      setProducts([]); // prevent crash
+    });
+}, []);
 
   return (
     <>
-      {/* 🔥 TOP BAR */}
+
       <div className="topbar">
         <span>Select location</span>
         <span>Stores & Preschools</span>
         <span>Support</span>
         <span>Track Order</span>
-
-        {/* ✅ LOGIN BUTTON */}
-        <button className="login-link" onClick={handleAccount}>
-          Login / Register
-        </button>
-
+        <Link to="/login" className="login-link">My Account</Link>
         <span onClick={() => navigate("/cart")}>Cart</span>
         <span onClick={() => navigate("/wishlist")}>Wishlist</span>
       </div>
 
-      {/* 🔥 MENU */}
+  
       <nav className="menu">
         <a>ALL CATEGORIES</a>
         <a>BOY FASHION</a>
@@ -61,21 +53,19 @@ function Header() {
         <a>MOMS</a>
       </nav>
 
-      {/* 🔥 HEADER */}
       <header className="header">
         <div className="logo">firstcry</div>
-
         <div className="search">
           <input placeholder="Search for a Category, Brand or Product" />
         </div>
       </header>
 
-      {/* 🔥 BANNER */}
+      
       <section className="banner-new">
         <img src="https://miniklub.in/cdn/shop/files/SS_26_Desktop-Banner.jpg?v=1768308772&width=1920" />
       </section>
 
-      {/* 🔥 PREMIUM */}
+      
       <section className="premium">
         <h2>PREMIUM BOUTIQUES</h2>
 
@@ -95,12 +85,10 @@ function Header() {
         </div>
       </section>
 
-      {/* 🔥 SECOND BANNER */}
       <section className="banner-new">
         <img src="https://cdn.fcglcdn.com/brainbees/banners/desktop_baby_growth_&_development1774849772013.webp" />
       </section>
 
-      {/* 🔥 SEASONAL */}
       <section className="seasonal">
         <h2>Seasonal STAPLES</h2>
         <p>Effortless styles endless options</p>
@@ -112,10 +100,22 @@ function Header() {
           <img src="https://cdn.fcglcdn.com/brainbees/images/cattemplate/spring_desktop_page_270126_09.jpg" />
           <img src="https://cdn.fcglcdn.com/brainbees/images/cattemplate/spring_desktop_page_270126_08.jpg" />
           <img src="https://cdn.fcglcdn.com/brainbees/images/cattemplate/moas25_nonapp_desktop_page_081225_17.jpg" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/11794449a.webp" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/8967449a.webp" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/3437929a.webp" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/15547772a.webp" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/15576588a.webp" />
+          <img src="https://cdn.fcglcdn.com/brainbees/images/products/219x265/20367936a.webp" />
+
         </div>
+
       </section>
 
-      {/* 🔥 PRODUCTS */}
+      <section className="banner-new">
+        <img src="https://cdn.fcglcdn.com/brainbees/banners/hp_mktg_p04_sec2_flat60_desktop1774959024725.webp" />
+      </section>
+
+     
       <section className="admin-products">
         <h2 className="admin-title">Our Products</h2>
 
@@ -126,7 +126,7 @@ function Header() {
               className="admin-product-card"
               onClick={() => navigate(`/product/${item._id}`)}
             >
-              <img src={item.image} alt={item.name} />
+              <img src={item.image} />
               <h4>{item.name}</h4>
               <p>₹{item.price}</p>
             </div>
