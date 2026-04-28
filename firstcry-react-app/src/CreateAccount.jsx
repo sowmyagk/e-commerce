@@ -14,11 +14,10 @@ function CreateAccount() {
     e.preventDefault();
 
     try {
-      const result = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
-        name,
-        email,
-        phone
-      });
+      const result = await axios.post(
+  `${import.meta.env.VITE_API_URL}/api/otp/send`,
+  { email }
+);
 
       console.log(result.data);
       alert("OTP sent successfully");

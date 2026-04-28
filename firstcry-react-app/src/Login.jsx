@@ -15,13 +15,15 @@ function Login() {
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/OTP`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ value })
-      });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: value
+  })
+});
 
       const data = await res.json();
 

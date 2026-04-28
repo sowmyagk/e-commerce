@@ -10,14 +10,16 @@ function OtpPage() {
 
   const handleVerify = async () => {
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        value: location.state?.value,
-        otp: otpInput
-      })
-    });
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: location.state?.value,
+    otp: otpInput,
+    name: location.state?.name,
+    phone: location.state?.phone
+  })
+});
 
     const data = await res.json();
 
