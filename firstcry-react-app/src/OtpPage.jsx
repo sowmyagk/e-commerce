@@ -1,20 +1,31 @@
-import React, { useState } from "react";
-import "./OtpPage.css";
-import axios from "axios";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export default function OtpPage() {
-  const [otp, setOtp] = useState("");
+function OtpPage() {
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  const verifyOtp = async () => {
-    const res = await axios.post("http://localhost:3001/api/verify-otp", {
-      input: location.state.input,
-      otp,
+  const [otpInput, setOtpInput] = useState("");
+
+  const handleVerify = async () => {
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        value: location.state?.value,
+        otp: otpInput
+      })
     });
 
-    if (res.data.success) {
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("user", JSON.stringify({
+        value: location.state?.value
+      }));
+
       alert("Login Successful");
       navigate("/");
     } else {
@@ -23,16 +34,21 @@ export default function OtpPage() {
   };
 
   return (
-    <div className="otp-container">
-      <h3>Enter OTP</h3>
+    <div>
+      <h2>Enter OTP</h2>
+
+      <p>OTP sent to {location.state?.value}</p>
 
       <input
         type="text"
         maxLength="6"
-        onChange={(e) => setOtp(e.target.value)}
+        value={otpInput}
+        onChange={(e) => setOtpInput(e.target.value)}
       />
 
-      <button onClick={verifyOtp}>SUBMIT</button>
+      <button onClick={handleVerify}>VERIFY OTP</button>
     </div>
   );
 }
+
+export default OtpPage;

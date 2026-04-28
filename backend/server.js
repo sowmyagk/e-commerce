@@ -5,8 +5,6 @@ const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
 const sendEmailOTP = require("./utils/sendEmail");
-
-// ✅ NEW: USER MODEL
 const User = require("./models/User");
 
 // Routes
@@ -18,12 +16,10 @@ const stripeRoutes = require("./routes/stripe");
 
 const app = express();
 
-
 // ✅ CORS
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
 }));
 
 app.use(express.json());
@@ -51,41 +47,32 @@ app.use("/api/address", addressRoutes);
 app.use("/api/payment", stripeRoutes);
 
 
-// ✅ Test route
+// ✅ Test
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
 
 // ===============================
-// 🔐 AUTH SYSTEM STARTS HERE
+// 🔐 AUTH SYSTEM
 // ===============================
 
-// ✅ OTP STORE
 const otpStore = {};
 
-
-// ✅ EMAIL VALIDATION
-const isValidEmail = (email) => {
-  return /\S+@\S+\.\S+/.test(email);
-};
+const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
 
-// ✅ CHECK USER EXISTS (🔥 IMPORTANT)
+// ✅ CHECK USER
 app.post("/api/user/check", async (req, res) => {
   try {
     const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: "Email required" });
-    }
 
     const user = await User.findOne({ email });
 
     res.json({ exists: !!user });
 
   } catch (err) {
-    console.log("CHECK USER ERROR:", err);
+    console.log(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -96,17 +83,10 @@ app.post("/api/otp/send", async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
+    if (!email || !isValidEmail(email)) {
       return res.status(400).json({
         success: false,
-        message: "Email required"
-      });
-    }
-
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid email format"
+        message: "Invalid email"
       });
     }
 
@@ -119,105 +99,68 @@ app.post("/api/otp/send", async (req, res) => {
 
     await sendEmailOTP(email, otp);
 
+    console.log("OTP:", otp); // 🔥 debug
+
     res.json({
       success: true,
-      message: "OTP sent successfully"
+      message: "OTP sent"
     });
 
   } catch (err) {
-    console.log("OTP SEND ERROR:", err);
-
+    console.log(err);
     res.status(500).json({
       success: false,
-      message: "Failed to send OTP"
+      message: "OTP failed"
     });
   }
 });
 
 
-// ✅ VERIFY OTP + SAVE USER (🔥 MOST IMPORTANT FIX)
+// ✅ VERIFY OTP
 app.post("/api/otp/verify", async (req, res) => {
   try {
     const { email, otp, name, phone } = req.body;
 
-    if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and OTP required"
-      });
-    }
-
     const record = otpStore[email];
 
     if (!record) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP not found"
-      });
+      return res.json({ success: false, message: "No OTP" });
     }
 
     if (Date.now() > record.expiresAt) {
       delete otpStore[email];
-      return res.status(400).json({
-        success: false,
-        message: "OTP expired"
-      });
+      return res.json({ success: false, message: "Expired" });
     }
 
     if (record.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP"
-      });
+      return res.json({ success: false, message: "Wrong OTP" });
     }
 
     delete otpStore[email];
 
-    // ✅ SAVE USER IF NEW
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({
-        name,
-        email,
-        phone
-      });
-
+      user = new User({ name, email, phone });
       await user.save();
       console.log("✅ New user saved");
-    } else {
-      console.log("✅ Existing user login");
     }
 
-    res.json({
-      success: true,
-      message: "OTP verified"
-    });
+    res.json({ success: true });
 
   } catch (err) {
-    console.log("VERIFY ERROR:", err);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
+    console.log(err);
+    res.status(500).json({ success: false });
   }
 });
 
 
 // ===============================
-// 🔐 AUTH SYSTEM ENDS HERE
+// ERROR HANDLER
 // ===============================
-
-
-// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err.stack);
-
-  res.status(500).json({
-    success: false,
-    message: "Something went wrong",
-  });
+  console.error(err);
+  res.status(500).json({ success: false });
 });
 
 

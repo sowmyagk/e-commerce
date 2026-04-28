@@ -1,42 +1,90 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-export default function Login() {
-  const [input, setInput] = useState("");
+function Login() {
+
   const navigate = useNavigate();
+  const [value, setValue] = useState("");
 
-  const handleContinue = async () => {
+  const handleLogin = async () => {
+
+    if (!value) {
+      alert("Please enter Email or Mobile");
+      return;
+    }
+
     try {
-      const res = await axios.post("http://localhost:3001/api/check-user", {
-        input,
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/OTP`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ value })
       });
 
-      if (res.data.exists) {
-        // Existing user → send OTP
-        await axios.post("http://localhost:3001/api/send-otp", { input });
+      const data = await res.json();
 
-        navigate("/otp", { state: { input } });
+      if (data.success) {
+        navigate("/OtpPage", {
+          state: {
+            value: value,
+          }
+        });
       } else {
-        // New user → go to register
-        navigate("/register", { state: { input } });
+        alert("Failed to send OTP");
       }
-    } catch (err) {
-      console.log(err);
+
+    } catch (error) {
+      console.log(error);
+      alert("Server error");
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Log In / Register</h2>
-      <input
-        type="text"
-        placeholder="Enter Email or Mobile"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button onClick={handleContinue}>CONTINUE</button>
+    <div className="main-box">
+
+      <div className="offer">
+        <img
+          src="https://cdn.fcglcdn.com/brainbees/images/m/login_revamp_banner_mobile.webp"
+          alt="offer"
+        />
+      </div>
+      <div className="login-box">
+        <h2>Log In / Register</h2>
+
+        <label>Email-Id or Mobile No*</label>
+        <input
+          type="text"
+          placeholder="Enter your Email-Id or Mobile No*"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+
+        <button className="btn" onClick={handleLogin}>
+          CONTINUE
+        </button>
+
+        <p className="register">
+          New user? <Link to="/register">Register Here</Link>
+        </p>
+
+        <p className="or">Or login with</p>
+
+        <div className="google-btn">
+          <img
+            src="https://img.icons8.com/color/20/google-logo.png"
+            alt="google"
+          />
+        </div>
+
+        <p className="terms">
+          By continuing, you agree to Terms of Use & Privacy Policy
+        </p>
+      </div>
+
     </div>
   );
 }
+
+export default Login;

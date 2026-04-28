@@ -1,24 +1,158 @@
-.login-container {
-  width: 400px;
-  margin: auto;
-  margin-top: 100px;
+/* FULL PAGE BACKGROUND */
+body {
+  background: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* MAIN WRAPPER */
+.main-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* OFFER BANNER */
+.offer img {
+  width: 600px;
+  height: auto;
+  border-radius: 4px 4px 0 0;
+}
+
+/* LOGIN BOX */
+.login-box {
+  width: 600px;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   text-align: center;
 }
 
-.login-container input {
-  width: 100%;
-  padding: 12px;
-  margin: 15px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+/* TITLE */
+.login-box h2 {
+  margin-bottom: 25px;
+  font-weight: 500;
+  color: #333;
 }
 
-.login-container button {
+/* LABEL */
+.login-box label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+/* INPUT */
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-box input:focus {
+  border-color: #ff6f00;
+}
+
+/* BUTTON */
+.btn {
   width: 100%;
   padding: 12px;
   background: #ff6f00;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #e65c00;
+}
+
+/* REGISTER TEXT */
+.register {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.register a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.register a:hover {
+  text-decoration: underline;
+}
+
+/* OR LINE */
+.or {
+  position: relative;
+  font-size: 13px;
+  color: #777;
+  margin: 20px 0;
+}
+
+.or::before,
+.or::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background: #ddd;
+}
+
+.or::before {
+  left: 0;
+}
+
+.or::after {
+  right: 0;
+}
+
+/* GOOGLE BUTTON */
+.google-btn {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 20px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.google-btn:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* TERMS */
+.terms {
+  font-size: 12px;
+  color: #777;
+  line-height: 1.5;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .offer img,
+  .login-box {
+    width: 90%;
+  }
+
+  .login-box {
+    padding: 20px;
+  }
 }

@@ -1,18 +1,147 @@
-.register-container {
-  width: 400px;
-  margin: auto;
-  margin-top: 80px;
+/* PAGE BACKGROUND */
+body {
+  background: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.register-container input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
+/* MAIN PAGE */
+.register-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
 }
 
-.register-container button {
+/* TOP BANNER */
+.register-banner img {
+  width: 600px;
+  border-radius: 4px 4px 0 0;
+}
+
+/* CARD */
+.register-card {
+  width: 600px;
+  background: #fff;
+  padding: 25px 35px;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.register-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.register-header h2 {
+  font-weight: 500;
+  color: #333;
+}
+
+.back-arrow {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* FORM GROUP */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.form-group label span {
+  color: red;
+}
+
+/* INPUT */
+.form-group input {
   width: 100%;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #ff6f00;
+}
+
+/* MOBILE BOX */
+.mobile-box {
+  display: flex;
+  gap: 10px;
+}
+
+.mobile-box select {
+  width: 80px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  background: #fff;
+  outline: none;
+}
+
+.mobile-box input {
+  flex: 1;
+}
+
+/* OTP TEXT */
+.otp-text {
+  display: block;
+  font-size: 12px;
+  color: #007bff;
+  margin-top: 5px;
+}
+
+/* BUTTON */
+.otp-btn {
+  width: 60%;
+  display: block;
+  margin: 20px auto 0;
   padding: 12px;
   background: #ff6f00;
   color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.otp-btn:hover {
+  background: #e65c00;
+}
+
+/* INFO BOX (your inline style replacement if needed) */
+.info-box {
+  font-size: 13px;
+  background: #f6f1e5;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .register-banner img,
+  .register-card {
+    width: 90%;
+  }
+
+  .register-card {
+    padding: 20px;
+  }
+
+  .otp-btn {
+    width: 100%;
+  }
 }

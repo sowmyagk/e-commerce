@@ -1,47 +1,119 @@
 import React, { useState } from "react";
 import "./CreateAccount.css";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
 
-export default function CreateAccount() {
-  const location = useLocation();
-  const navigate = useNavigate();
+function CreateAccount() {
+  const navigate = useNavigate();  
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    mobile: location.state?.input || "",
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const handleRegister = async () => {
-    await axios.post("http://localhost:3001/api/register", form);
+  const handleOtp = async (e) => {
+    e.preventDefault();
 
-    await axios.post("http://localhost:3001/api/send-otp", {
-      input: form.mobile,
-    });
+    try {
+      const result = await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
+        name,
+        email,
+        phone
+      });
 
-    navigate("/otp", { state: { input: form.mobile } });
+      console.log(result.data);
+      alert("OTP sent successfully");
+      navigate("/OtpPage", {
+  state: {
+    value: email,
+    name,
+    phone
+  }
+});
+
+    } catch (err) {
+      console.log(err);
+      alert("Error sending OTP");
+    }
   };
 
   return (
-    <div className="register-container">
-      <h2>Create Account</h2>
+    <div className="register-page">
 
-      <input
-        placeholder="Full Name"
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-      />
-      <input
-        placeholder="Email"
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-      />
-      <input
-        placeholder="Mobile"
-        value={form.mobile}
-        onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-      />
+      <div className="register-banner">
+        <img
+          src="https://cdn.fcglcdn.com/brainbees/images/m/login_revamp_banner_mobile.webp"
+          alt="offer"
+        />
+      </div>
 
-      <button onClick={handleRegister}>GET OTP</button>
+      <div className="register-card">
+
+        <div className="register-header">
+          <span className="back-arrow">←</span>
+          <h2>Register</h2>
+        </div>
+
+        <p style={{
+          fontSize:"13px",
+          background:"#f6f1e5",
+          padding:"8px",
+          borderRadius:"6px",
+          marginBottom:"15px"
+        }}>
+          Kindly fill & submit the below information to create your FirstCry account
+        </p>
+
+    
+        <div className="form-group">
+          <label>Full Name <span>*</span></label>
+          <input
+            type="text"
+            placeholder="Full Name*"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Email Id <span>*</span></label>
+          <input
+            type="email"
+            placeholder="Email Id*"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+      
+        <div className="form-group">
+          <label>Your Mobile No. <span>*</span></label>
+
+          <div className="mobile-box">
+            <select>
+              <option>+91</option>
+              <option>+1</option>
+            </select>
+
+            <input
+              type="text"
+              placeholder="Enter Mobile Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <span className="otp-text">
+            OTP will be sent on this mobile number for verification
+          </span>
+        </div>
+
+        <button className="otp-btn" onClick={handleOtp}>
+          GET OTP
+        </button>
+
+      </div>
     </div>
   );
 }
+
+export default CreateAccount;
