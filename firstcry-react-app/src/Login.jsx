@@ -8,7 +8,7 @@ function Login() {
   const [value, setValue] = useState("");
 
   const handleLogin = async () => {
-  console.log("Button clicked"); //  ADD THIS
+  console.log("Button clicked"); 
 
   if (!value) {
     alert("Please enter Email or Mobile");
