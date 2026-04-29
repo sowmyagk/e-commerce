@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:userId", async (req, res) => {
   try {
-    const items = await Cart.find({ userId: req.params.userId });
+    const items = await Cart.find({ email: req.params.email });
     res.json(items);
   } catch (err) {
     res.status(500).json(err);
