@@ -5,15 +5,16 @@ const sendEmail = async (email, otp) => {
     service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
+      pass: process.env.EMAIL_PASS,
+    },
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: `"FirstCry Clone" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "OTP Verification",
-    text: `Your OTP is ${otp}`
+    html: `<h2>Your OTP is: ${otp}</h2>
+           <p>This OTP is valid for 5 minutes.</p>`,
   });
 };
 
