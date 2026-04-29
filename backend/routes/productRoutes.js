@@ -7,7 +7,7 @@ const Product = require("../models/Product");
 
 const router = express.Router();
 
-// ✅ Cloudinary storage
+
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -18,7 +18,6 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-// ✅ ADD PRODUCT
 router.post("/add-product", upload.single("image"), async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -32,7 +31,7 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
       price,
       brand,
       productdescription,
-      image: req.file.path // ✅ CLOUDINARY URL
+      image: req.file.path
     });
 
     await product.save();
@@ -45,17 +44,17 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
   }
 });
 
-// ✅ GET PRODUCTS
+
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
-    res.json(products); // ✅ DIRECT (image already full URL)
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products" });
   }
 });
 
-// ✅ UPDATE
+
 router.put("/update-product/:id", async (req, res) => {
   try {
     const { name, price, brand, productdescription } = req.body;
@@ -74,7 +73,7 @@ router.put("/update-product/:id", async (req, res) => {
   }
 });
 
-// ✅ DELETE
+
 router.delete("/remove-product/:id", async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
