@@ -40,8 +40,7 @@ function ProductDetails() {
 const addToCart = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
-
-  if (!user || !user.value) {
+  if (!user || !user.email) {
     alert("Please login first");
     return;
   }
@@ -52,7 +51,7 @@ const addToCart = () => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      userId: user.value,
+      email: user.email,  
       name: product.name,
       price: Number(product.price),
       brand: product.brand,
