@@ -33,8 +33,7 @@ function ViewProduct() {
       <h2 className="title">Products</h2>
 
       {products.map((item) => {
-        
-        // ✅ ADD THIS LINE HERE
+       
         console.log(item.image);
 
         return (
@@ -47,17 +46,15 @@ function ViewProduct() {
             />
 
 
-            {/* NAME */}
             <span className="product-name">
               {item.name}
             </span>
 
-            {/* PRICE */}
             <span className="product-price">
               ₹{item.price}
             </span>
 
-            {/* ACTIONS */}
+      
             <div className="actions">
               <button
                 className="edit-btn"

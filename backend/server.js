@@ -24,6 +24,9 @@ cloudinary.config({
 });
 
 
+
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -53,7 +56,7 @@ app.post("/api/otp/send", async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.json({ success: false, message: "Email required" });
+    return res.json({ success: false });
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -72,9 +75,10 @@ app.post("/api/otp/send", async (req, res) => {
 
   } catch (err) {
     console.log("EMAIL ERROR:", err);
-    res.json({ success: false, message: "Failed to send OTP" });
+    res.json({ success: false });
   }
 });
+
 
 
 app.post("/api/otp/verify", async (req, res) => {
@@ -105,7 +109,7 @@ app.post("/api/otp/verify", async (req, res) => {
     }
   }
 
-  res.json({ success: false, message: "Invalid or Expired OTP" });
+  res.json({ success: false });
 });
 
 

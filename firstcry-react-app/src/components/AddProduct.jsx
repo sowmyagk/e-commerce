@@ -25,7 +25,7 @@ function AddProduct() {
             setPrice(product.price);
             setBrand(product.brand);
             setProductDescription(product.productdescription);
-            setExistingImage(product.image); // ✅ already correct
+            setExistingImage(product.image); 
           }
         });
     }
@@ -113,7 +113,6 @@ function AddProduct() {
             onChange={(e) => setProductDescription(e.target.value)}
           />
 
-          {/* ✅ SHOW EXISTING IMAGE (EDIT MODE ONLY) */}
           {id && existingImage && (
             <img
               src={`${import.meta.env.VITE_API_URL}/${existingImage}`}

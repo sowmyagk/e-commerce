@@ -8,41 +8,41 @@ function Login() {
   const [value, setValue] = useState("");
 
   const handleLogin = async () => {
+  console.log("Button clicked"); //  ADD THIS
 
-    if (!value) {
-      alert("Please enter Email or Mobile");
-      return;
+  if (!value) {
+    alert("Please enter Email or Mobile");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: value
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      navigate("/OtpPage", {
+        state: {
+          value: value,
+        }
+      });
+    } else {
+      alert("Failed to send OTP");
     }
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    email: value
-  })
-});
-
-      const data = await res.json();
-
-      if (data.success) {
-        navigate("/OtpPage", {
-          state: {
-            value: value,
-          }
-        });
-      } else {
-        alert("Failed to send OTP");
-      }
-
-    } catch (error) {
-      console.log(error);
-      alert("Server error");
-    }
-  };
-
+  } catch (error) {
+    console.log(error);
+    alert("Server error");
+  }
+};
   return (
     <div className="main-box">
 
