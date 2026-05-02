@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
 });
 
 
-router.get("/:userId", async (req, res) => {
+router.get("/:email", async (req, res) => {
   try {
     const items = await Cart.find({ email: req.params.email });
     res.json(items);
@@ -22,7 +22,6 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json(err);
   }
 });
-
 
 router.delete("/:id", async (req, res) => {
   try {
