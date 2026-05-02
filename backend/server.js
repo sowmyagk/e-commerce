@@ -68,11 +68,11 @@ app.post("/api/otp/send", async (req, res) => {
     await sendEmail(email, otp);
     console.log("✅ EMAIL SENT SUCCESS");
 
-    return res.json({
-      success: true,
-      isNewUser: !user // ✅ FIXED (RETURN HERE INSTEAD)
-    });
-
+   return res.json({
+  success: true,
+  isNewUser: !user,
+  debugOtp: otp   // ✅ TEMP FOR TESTING
+});
   } catch (err) {
     console.log("❌ EMAIL ERROR:", err.message);
 
