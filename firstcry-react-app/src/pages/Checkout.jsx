@@ -15,7 +15,6 @@ function Checkout() {
 
   const [payment, setPayment] = useState("cod");
 
-  // ✅ GET USER
   const user = JSON.parse(localStorage.getItem("user"));
 
   if (!user || !user.email) {
@@ -32,15 +31,26 @@ function Checkout() {
 
   const handleOrder = async () => {
     try {
+
+      // ✅ FIXED (NEW CODE) → FETCH CART
+      const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
+      const cart = await cartRes.json();
+
+      // ✅ FIXED (NEW CODE) → CALCULATE TOTAL
+      const totalAmount = cart.reduce((sum, item) => {
+        return sum + item.price * item.quantity;
+      }, 0);
+
+      // ✅ FIXED (UPDATED BODY)
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          email: user.email,   // ✅ FIXED
-          ...form,
-          paymentMethod: payment
+          email: user.email,
+          items: cart,
+          totalAmount
         })
       });
 

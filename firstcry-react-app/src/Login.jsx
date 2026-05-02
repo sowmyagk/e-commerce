@@ -33,11 +33,14 @@ console.log("API URL:", import.meta.env.VITE_API_URL);
     const data = await res.json();
 
     if (data.success) {
-      navigate("/OtpPage", {
-        state: {
-          value: value,
-        }
-      });
+  if (data.isNewUser) {
+    navigate("/register");
+  } else {
+    navigate("/OtpPage", {
+      state: { value }
+    });
+  }
+
     } else {
       alert("Failed to send OTP");
     }

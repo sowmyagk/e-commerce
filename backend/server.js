@@ -63,9 +63,17 @@ app.post("/api/otp/send", async (req, res) => {
   }
 
   // Optional validation
-  if (!email.includes("@")) {
+  if (!email || email.length < 5) {
     return res.json({ success: false, message: "Invalid email" });
   }
+
+
+  const user = await User.findOne({ email });
+
+return res.json({
+  success: true,
+  isNewUser: !user
+});
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -81,14 +89,12 @@ app.post("/api/otp/send", async (req, res) => {
     });
 
     console.log("✅ OTP SENT:", otp);
-        
+
+
     return res.json({
-  success: true,
-  user: {
-    email: user.email,
-    name: user.name
-  }
+  success: true
 });
+
 
   } catch (err) {
     console.log("❌ SERVER ERROR:", err);

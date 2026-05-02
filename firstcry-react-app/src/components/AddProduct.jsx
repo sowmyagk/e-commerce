@@ -115,7 +115,7 @@ function AddProduct() {
 
           {id && existingImage && (
             <img
-              src={`${import.meta.env.VITE_API_URL}/${existingImage}`}
+              src={existingImage}   // FIXED HERE
               width="120"
               style={{ marginBottom: "10px" }}
               alt="product"

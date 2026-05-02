@@ -12,7 +12,7 @@ function OrderHistory() {
       return;
     }
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${user._id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/orders/${user.email}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

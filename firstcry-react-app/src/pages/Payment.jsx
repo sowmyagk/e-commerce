@@ -20,9 +20,7 @@ function Payment() {
 
     const data = await res.json();
 
-    await stripe.redirectToCheckout({
-      sessionId: data.id
-    });
+    window.location.href = data.url;
   };
 
   return (
