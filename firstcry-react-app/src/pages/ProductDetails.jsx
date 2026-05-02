@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useNavigate } from "react-router-dom";
-const navigate = useNavigate();
 
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/products`)
