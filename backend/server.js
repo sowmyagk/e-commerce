@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
-
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -17,6 +16,8 @@ const User = require("./models/User");
 
 const app = express();
 
+
+// ☁️ Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -24,16 +25,18 @@ cloudinary.config({
 });
 
 
+// 🔐 Middleware
 app.use(cors());
 app.use(express.json());
 
 
+// 🍃 MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log(" MongoDB connected"))
-  .catch(err => console.log(" MongoDB error:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.log("❌ MongoDB error:", err));
 
 
-
+// 📦 Routes
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
@@ -41,42 +44,54 @@ app.use("/api/address", addressRoutes);
 app.use("/api/payment", stripeRoutes);
 
 
+// 🏠 Test Route
 app.get("/", (req, res) => {
-  res.send(" API is running...");
+  res.send("API is running...");
 });
 
 
+// 🔢 OTP Store (temporary)
 let otpStore = {};
 
 
+// 📩 SEND OTP (INSTANT ⚡)
 app.post("/api/otp/send", async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.json({ success: false });
+    return res.json({ success: false, message: "Email required" });
+  }
+
+  // Optional validation
+  if (!email.includes("@")) {
+    return res.json({ success: false, message: "Invalid email" });
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   otpStore[email] = {
     otp,
-    expires: Date.now() + 5 * 60 * 1000 // 5 mins
+    expires: Date.now() + 5 * 60 * 1000 // 5 minutes
   };
 
   try {
-    await sendEmail(email, otp);
+    // ⚡ Send email WITHOUT waiting
+    sendEmail(email, otp).catch(err => {
+      console.log("❌ EMAIL ERROR:", err);
+    });
 
-    console.log(" OTP SENT:", otp);
+    console.log("✅ OTP SENT:", otp);
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log(" EMAIL ERROR:", err);
-    res.json({ success: false });
+    console.log("❌ SERVER ERROR:", err);
+    return res.json({ success: false });
   }
 });
 
 
+// ✅ VERIFY OTP
 app.post("/api/otp/verify", async (req, res) => {
   const { email, otp, name, phone } = req.body;
 
@@ -88,32 +103,32 @@ app.post("/api/otp/verify", async (req, res) => {
     record.expires > Date.now()
   ) {
     try {
-      
       let user = await User.findOne({ email });
 
-     
+      // 🆕 Create new user if not exists
       if (!user && name && phone) {
         user = new User({ name, email, phone });
         await user.save();
       }
 
+      // 🧹 Remove OTP after success
       delete otpStore[email];
 
       return res.json({ success: true });
 
     } catch (err) {
-      console.log(" VERIFY ERROR:", err);
+      console.log("❌ VERIFY ERROR:", err);
       return res.json({ success: false });
     }
   }
 
-  res.json({ success: false });
+  return res.json({ success: false, message: "Invalid or expired OTP" });
 });
 
 
-
+// 🚀 Server Start
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(` Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
