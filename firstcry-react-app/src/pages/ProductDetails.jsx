@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+const navigate = useNavigate();
+
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -14,31 +17,11 @@ function ProductDetails() {
       });
   }, [id]);
 
-//const addToCart = () => {
-  //const user = JSON.parse(localStorage.getItem("user"));
-
-  //fetch(`${import.meta.env.VITE_API_URL}/api/cart`, {
-    //method: "POST",
-    //headers: {
-    //  "Content-Type": "application/json"
-   // },
-    //body: JSON.stringify({
-    //  userId: user.value,   
-     // name: product.name,
-     // price: Number(product.price),
-     // brand: product.brand,
-     // image: product.image,
-     // quantity: 1
-  //  })
-  //})
-   // .then(res => res.json())
-   // .then(() => {
-  //    alert("Product added to cart");
-  //  });
-//};
-
 const addToCart = () => {
+  console.log("Button clicked");
+
   const user = JSON.parse(localStorage.getItem("user"));
+  console.log("User:", user);
 
   if (!user || !user.email) {
     alert("Please login first");
@@ -51,7 +34,7 @@ const addToCart = () => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      email: user.email,  
+      email: user.email,
       name: product.name,
       price: Number(product.price),
       brand: product.brand,
@@ -60,10 +43,13 @@ const addToCart = () => {
     })
   })
     .then(res => res.json())
-    .then(() => {
+    .then(data => {
+      console.log("Added:", data);
       alert("Product added to cart");
+
+      navigate("/cart");   // ✅ THIS LINE IS IMPORTANT
     })
-    .catch(err => console.log(err));
+    .catch(err => console.log("Error:", err));
 };
   if (!product) return <h2>Loading...</h2>;
 
