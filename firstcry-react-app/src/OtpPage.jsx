@@ -68,10 +68,7 @@ function OtpPage() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ value: location.state?.value })
-      );
+      localStorage.setItem("user", JSON.stringify(data.user)); 
 
       alert("Login Successful");
       navigate("/");
