@@ -84,9 +84,12 @@ return res.json({
 
   try {
     // ⚡ Send email WITHOUT waiting
-    sendEmail(email, otp).catch(err => {
-      console.log("❌ EMAIL ERROR:", err);
-    });
+    try {
+  await sendEmail(email, otp);
+  console.log("EMAIL SENT SUCCESS");
+} catch (err) {
+  console.log("EMAIL ERROR FULL:", err.response?.body || err.message);
+}
 
     console.log("✅ OTP SENT:", otp);
 
