@@ -9,14 +9,19 @@ async function sendEmail(to, otp) {
     },
   });
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: to,
-    subject: "OTP Verification",
-    text: `Your OTP is ${otp}`,
-  };
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: to,
+      subject: "OTP Verification",
+      text: `Your OTP is ${otp}`,
+    });
 
-  await transporter.sendMail(mailOptions);
+    console.log("✅ EMAIL SENT:", info.response);
+
+  } catch (error) {
+    console.log("❌ EMAIL ERROR FULL:", error);
+  }
 }
 
 module.exports = sendEmail;
