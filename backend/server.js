@@ -61,7 +61,8 @@ app.post("/api/otp/send", async (req, res) => {
     expires: Date.now() + 5 * 60 * 1000
   };
 
-  console.log("OTP:", otp, "EMAIL:", email); // ✅ DEBUG
+   console.log("EMAIL_USER:", process.env.EMAIL_USER);
+   console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
 
   try {
     // ✅ FIXED (PROPER EMAIL CALL)
@@ -74,7 +75,7 @@ app.post("/api/otp/send", async (req, res) => {
   debugOtp: otp   // ✅ TEMP FOR TESTING
 });
   } catch (err) {
-    console.log("❌ EMAIL ERROR:", err.message);
+    console.log("❌ FULL EMAIL ERROR:", JSON.stringify(err, null, 2));
 
     return res.json({
       success: false,
