@@ -81,8 +81,14 @@ app.post("/api/otp/send", async (req, res) => {
     });
 
     console.log("✅ OTP SENT:", otp);
-
-    return res.json({ success: true });
+        
+    return res.json({
+  success: true,
+  user: {
+    email: user.email,
+    name: user.name
+  }
+});
 
   } catch (err) {
     console.log("❌ SERVER ERROR:", err);
