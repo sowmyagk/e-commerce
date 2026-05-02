@@ -153,6 +153,3 @@ function OtpPage() {
 export default OtpPage;
 
 
-
-
-//now i want to create the GST Bill in a pdf format

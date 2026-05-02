@@ -1,20 +1,17 @@
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendEmail = async (email, otp) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS // app password
-    }
-  });
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  const msg = {
     to: email,
+    from: process.env.EMAIL_USER,
     subject: "Your OTP Code",
-    text: `Your OTP is ${otp}`
-  });
+    text: `Your OTP is ${otp}`,
+    html: `<h2>Your OTP is: ${otp}</h2>`,
+  };
+
+  await sgMail.send(msg);
 };
 
 module.exports = sendEmail;

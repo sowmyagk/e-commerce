@@ -46,7 +46,6 @@ app.get("/", (req, res) => {
 });
 
 
-// OTP STORE (per user)
 let otpStore = {};
 
 
@@ -110,6 +109,7 @@ app.post("/api/otp/verify", async (req, res) => {
 
   res.json({ success: false });
 });
+
 
 
 const PORT = process.env.PORT || 3001;
