@@ -49,59 +49,67 @@ let otpStore = {};
 // 📩 SEND OTP
 // =========================
 app.post("/api/otp/send", async (req, res) => {
-  const { email } = req.body;
+  try {   // ✅ FIX 1 (added try-catch)
+    const { email } = req.body;
 
-  if (!email || email.length < 5) {
-    return res.json({ success: false, message: "Invalid email" });
-  }
+    if (!email || email.length < 5) {
+      return res.json({ success: false, message: "Invalid email" });
+    }
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  otpStore[email] = {
-    otp,
-    expires: Date.now() + 5 * 60 * 1000
-  };
+    otpStore[email] = {
+      otp,
+      expires: Date.now() + 5 * 60 * 1000
+    };
 
-  console.log("🔢 OTP:", otp, "EMAIL:", email);
+    console.log("🔢 OTP:", otp, "EMAIL:", email);
 
-  // ✅ ENV DEBUG
-  console.log("EMAIL_USER:", process.env.EMAIL_USER);
-  console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
+    // ✅ ENV DEBUG
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
 
-  // 🚀 SEND EMAIL IN BACKGROUND (IMPORTANT FIX)
-  sendEmail(email, otp)
-    .then(() => {
-      console.log("✅ EMAIL SENT SUCCESS");
-    })
-    .catch((err) => {
-      console.log("❌ EMAIL ERROR:", err.message);
+    // 🚀 SEND EMAIL (non-blocking)
+    sendEmail(email, otp)
+      .then(() => {
+        console.log("✅ EMAIL SENT SUCCESS");
+      })
+      .catch((err) => {
+        console.log("❌ EMAIL ERROR:", err.message);
+      });
+
+    // ✅ FIX 2 (clean safe response)
+    return res.json({
+      success: true,
+      isNewUser: !user,
+      otp: otp   // ⚠️ for testing
     });
 
-  // ✅ ALWAYS RESPOND SUCCESS (like real apps)
-  return res.json({
-    success: true,
-    isNewUser: !user,
-    // ⚠️ TEMP: show OTP (for testing/demo)
-    otp: otp
-  });
+  } catch (err) {
+    console.log("❌ SEND OTP ERROR:", err);  // ✅ FIX 3
+    return res.json({
+      success: false,
+      message: "Server error"
+    });
+  }
 });
 
 // =========================
 // ✅ VERIFY OTP
 // =========================
 app.post("/api/otp/verify", async (req, res) => {
-  const { email, otp, name, phone } = req.body;
+  try {   // ✅ FIX 4 (added try-catch)
+    const { email, otp, name, phone } = req.body;
 
-  const record = otpStore[email];
+    const record = otpStore[email];
 
-  if (
-    record &&
-    record.otp === otp &&
-    record.expires > Date.now()
-  ) {
-    try {
+    if (
+      record &&
+      record.otp === otp &&
+      record.expires > Date.now()
+    ) {
       let user = await User.findOne({ email });
 
       // 🆕 Create user if not exists
@@ -113,17 +121,17 @@ app.post("/api/otp/verify", async (req, res) => {
       delete otpStore[email];
 
       return res.json({ success: true });
-
-    } catch (err) {
-      console.log("❌ VERIFY ERROR:", err);
-      return res.json({ success: false });
     }
-  }
 
-  return res.json({
-    success: false,
-    message: "Invalid or expired OTP"
-  });
+    return res.json({
+      success: false,
+      message: "Invalid or expired OTP"
+    });
+
+  } catch (err) {
+    console.log("❌ VERIFY ERROR:", err);
+    return res.json({ success: false });
+  }
 });
 
 // 🚀 START SERVER
