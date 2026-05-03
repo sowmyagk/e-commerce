@@ -16,7 +16,6 @@ const User = require("./models/User");
 
 const app = express();
 
-// ☁️ Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -26,12 +25,11 @@ cloudinary.config({
 app.use(cors());
 app.use(express.json());
 
-// 🟢 MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB error:", err));
 
-// 🛣️ Routes
+// ROUTES
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
@@ -42,102 +40,72 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// 🔢 OTP Store
+// OTP STORE
 let otpStore = {};
 
-// =========================
-// 📩 SEND OTP
-// =========================
+// SEND OTP
 app.post("/api/otp/send", async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email || email.length < 5) {
-      return res.json({ success: false, message: "Invalid email" });
+    if (!email) {
+      return res.json({ success: false });
     }
 
     const user = await User.findOne({ email });
 
-    // ✅ Prevent multiple OTP generation
+    // prevent overwrite
     if (otpStore[email] && otpStore[email].expires > Date.now()) {
-      return res.json({
-        success: true,
-        isNewUser: !user,
-        message: "OTP already sent. Please check your email."
-      });
+      console.log("⚠️ Using existing OTP:", otpStore[email].otp);
+      return res.json({ success: true, isNewUser: !user });
     }
 
-    // 🔢 Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     otpStore[email] = {
       otp,
-      expires: Date.now() + 5 * 60 * 1000 // 5 mins
+      expires: Date.now() + 5 * 60 * 1000
     };
 
     console.log("🔢 OTP:", otp, "EMAIL:", email);
 
-    // 📩 Send email (Resend)
-    const emailResponse = await sendEmail(email, otp);
+    await sendEmail(email, otp);
 
-    console.log("📩 Email Response:", emailResponse);
-
-    // ❌ If email failed
-    if (emailResponse && emailResponse.error) {
-      return res.json({
-        success: false,
-        message: emailResponse.error.message || "Email failed"
-      });
-    }
-
-    // ✅ Success
     return res.json({
       success: true,
       isNewUser: !user,
-      otp: otp // ⚠️ KEEP for demo, REMOVE in production
+      otp // for demo
     });
 
   } catch (err) {
-    console.log("❌ SEND OTP ERROR:", err);
-    return res.json({
-      success: false,
-      message: "Server error"
-    });
+    console.log("❌ SEND ERROR:", err);
+    return res.json({ success: false });
   }
 });
 
-// =========================
-// ✅ VERIFY OTP
-// =========================
+// VERIFY OTP
 app.post("/api/otp/verify", async (req, res) => {
   try {
     const { email, otp, name, phone } = req.body;
 
     const record = otpStore[email];
 
+    console.log("👉 Entered OTP:", otp);
+    console.log("👉 Stored OTP:", record?.otp);
+
     if (!record) {
-      return res.json({
-        success: false,
-        message: "No OTP found. Please request again."
-      });
+      return res.json({ success: false, message: "No OTP" });
     }
 
     if (record.expires < Date.now()) {
       delete otpStore[email];
-      return res.json({
-        success: false,
-        message: "OTP expired"
-      });
+      return res.json({ success: false, message: "Expired" });
     }
 
     if (record.otp !== otp) {
-      return res.json({
-        success: false,
-        message: "Invalid OTP"
-      });
+      return res.json({ success: false, message: "Invalid OTP" });
     }
 
-    // ✅ OTP correct
     let user = await User.findOne({ email });
 
     if (!user && name && phone) {
@@ -150,15 +118,11 @@ app.post("/api/otp/verify", async (req, res) => {
     return res.json({ success: true });
 
   } catch (err) {
-    console.log("❌ VERIFY ERROR:", err);
-    return res.json({
-      success: false,
-      message: "Verification failed"
-    });
+    console.log(err);
+    return res.json({ success: false });
   }
 });
 
-// 🚀 START SERVER
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {

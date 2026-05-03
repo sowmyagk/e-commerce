@@ -1,28 +1,29 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./OtpPage.css";
 
 function OtpPage() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const email = location.state?.value;   // ✅ FIX
+  const name = location.state?.name;
+  const phone = location.state?.phone;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(30);
 
   const inputsRef = useRef([]);
 
-  // ⏳ Timer countdown
   useEffect(() => {
     if (timer === 0) return;
 
     const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
+      setTimer(prev => prev - 1);
     }, 1000);
 
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Handle input change
   const handleChange = (value, index) => {
     if (!/^[0-9]?$/.test(value)) return;
 
@@ -35,62 +36,46 @@ function OtpPage() {
     }
   };
 
-  // ⬅ Backspace handling
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputsRef.current[index - 1].focus();
-    }
-  };
-
-  //  Verify OTP
   const handleVerify = async () => {
     const finalOtp = otp.join("");
 
-    if (finalOtp.length < 6) {
-      alert("Enter complete OTP");
-      return;
-    }
+    console.log("Sending OTP:", finalOtp, "Email:", email);
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/otp/verify`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: location.state?.value,
-          otp: finalOtp,
-          name: location.state?.name,
-          phone: location.state?.phone,
-        }),
-      }
-    );
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        otp: finalOtp,
+        name,
+        phone
+      })
+    });
 
     const data = await res.json();
 
     if (data.success) {
       localStorage.setItem("user", JSON.stringify({
-          email: value,
-          name: name || "User"
-        }));
-      
+        email: email,
+        name: name || "User"
+      }));
 
       alert("Login Successful");
       navigate("/");
     } else {
-      alert("Invalid OTP");
+      alert(data.message || "Invalid OTP");
     }
   };
 
-  // Resend OTP
   const handleResend = async () => {
     await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        email: location.state?.value,
-      }),
+      body: JSON.stringify({ email })
     });
 
     setTimer(30);
@@ -98,59 +83,29 @@ function OtpPage() {
   };
 
   return (
-    <div className="otp-container">
+    <div>
+      <h2>OTP Verification</h2>
+      <p>Sent to {email}</p>
 
-      {/* LEFT IMAGE */}
-      <div className="otp-banner">
-        <img
-          src="https://cdn.fcglcdn.com/brainbees/images/m/login_revamp_banner_mobile.webp"
-          alt="banner"
+      {otp.map((digit, i) => (
+        <input
+          key={i}
+          value={digit}
+          maxLength="1"
+          ref={el => inputsRef.current[i] = el}
+          onChange={(e) => handleChange(e.target.value, i)}
         />
-      </div>
+      ))}
 
-      {/* RIGHT BOX */}
-      <div className="otp-box">
-        <h2>OTP Verification</h2>
+      <button onClick={handleVerify}>Verify</button>
 
-        <p className="sub-text">
-          Enter the OTP sent to <b>{location.state?.value}</b>
-        </p>
-
-        {/* OTP INPUT BOXES */}
-        <div className="otp-inputs">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              type="text"
-              maxLength="1"
-              value={digit}
-              ref={(el) => (inputsRef.current[index] = el)}
-              onChange={(e) => handleChange(e.target.value, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-            />
-          ))}
-        </div>
-
-        {/* VERIFY BUTTON */}
-        <button className="verify-btn" onClick={handleVerify}>
-          VERIFY OTP
-        </button>
-
-        {/* TIMER / RESEND */}
-        <div className="resend-section">
-          {timer > 0 ? (
-            <p>Resend OTP in <span>{timer}s</span></p>
-          ) : (
-            <button onClick={handleResend} className="resend-btn">
-              Resend OTP
-            </button>
-          )}
-        </div>
-      </div>
+      {timer > 0 ? (
+        <p>{timer}s</p>
+      ) : (
+        <button onClick={handleResend}>Resend</button>
+      )}
     </div>
   );
 }
 
 export default OtpPage;
-
-
