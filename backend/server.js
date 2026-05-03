@@ -49,7 +49,7 @@ let otpStore = {};
 // 📩 SEND OTP
 // =========================
 app.post("/api/otp/send", async (req, res) => {
-  try {   // ✅ FIX 1 (added try-catch)
+  try {
     const { email } = req.body;
 
     if (!email || email.length < 5) {
@@ -58,37 +58,47 @@ app.post("/api/otp/send", async (req, res) => {
 
     const user = await User.findOne({ email });
 
+    // ✅ Prevent multiple OTP generation
+    if (otpStore[email] && otpStore[email].expires > Date.now()) {
+      return res.json({
+        success: true,
+        isNewUser: !user,
+        message: "OTP already sent. Please check your email."
+      });
+    }
+
+    // 🔢 Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     otpStore[email] = {
       otp,
-      expires: Date.now() + 5 * 60 * 1000
+      expires: Date.now() + 5 * 60 * 1000 // 5 mins
     };
 
     console.log("🔢 OTP:", otp, "EMAIL:", email);
 
-    // ✅ ENV DEBUG
-    console.log("EMAIL_USER:", process.env.EMAIL_USER);
-    console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
+    // 📩 Send email (Resend)
+    const emailResponse = await sendEmail(email, otp);
 
-    // 🚀 SEND EMAIL (non-blocking)
-    sendEmail(email, otp)
-      .then(() => {
-        console.log("✅ EMAIL SENT SUCCESS");
-      })
-      .catch((err) => {
-        console.log("❌ EMAIL ERROR:", err.message);
+    console.log("📩 Email Response:", emailResponse);
+
+    // ❌ If email failed
+    if (emailResponse && emailResponse.error) {
+      return res.json({
+        success: false,
+        message: emailResponse.error.message || "Email failed"
       });
+    }
 
-    // ✅ FIX 2 (clean safe response)
+    // ✅ Success
     return res.json({
       success: true,
       isNewUser: !user,
-      otp: otp   // ⚠️ for testing
+      otp: otp // ⚠️ KEEP for demo, REMOVE in production
     });
 
   } catch (err) {
-    console.log("❌ SEND OTP ERROR:", err);  // ✅ FIX 3
+    console.log("❌ SEND OTP ERROR:", err);
     return res.json({
       success: false,
       message: "Server error"
@@ -100,37 +110,51 @@ app.post("/api/otp/send", async (req, res) => {
 // ✅ VERIFY OTP
 // =========================
 app.post("/api/otp/verify", async (req, res) => {
-  try {   // ✅ FIX 4 (added try-catch)
+  try {
     const { email, otp, name, phone } = req.body;
 
     const record = otpStore[email];
 
-    if (
-      record &&
-      record.otp === otp &&
-      record.expires > Date.now()
-    ) {
-      let user = await User.findOne({ email });
-
-      // 🆕 Create user if not exists
-      if (!user && name && phone) {
-        user = new User({ name, email, phone });
-        await user.save();
-      }
-
-      delete otpStore[email];
-
-      return res.json({ success: true });
+    if (!record) {
+      return res.json({
+        success: false,
+        message: "No OTP found. Please request again."
+      });
     }
 
-    return res.json({
-      success: false,
-      message: "Invalid or expired OTP"
-    });
+    if (record.expires < Date.now()) {
+      delete otpStore[email];
+      return res.json({
+        success: false,
+        message: "OTP expired"
+      });
+    }
+
+    if (record.otp !== otp) {
+      return res.json({
+        success: false,
+        message: "Invalid OTP"
+      });
+    }
+
+    // ✅ OTP correct
+    let user = await User.findOne({ email });
+
+    if (!user && name && phone) {
+      user = new User({ name, email, phone });
+      await user.save();
+    }
+
+    delete otpStore[email];
+
+    return res.json({ success: true });
 
   } catch (err) {
     console.log("❌ VERIFY ERROR:", err);
-    return res.json({ success: false });
+    return res.json({
+      success: false,
+      message: "Verification failed"
+    });
   }
 });
 
