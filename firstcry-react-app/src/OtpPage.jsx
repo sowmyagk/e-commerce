@@ -5,7 +5,7 @@ function OtpPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const email = location.state?.value;   // ✅ FIX
+  const email = location.state?.value;   
   const name = location.state?.name;
   const phone = location.state?.phone;
 
