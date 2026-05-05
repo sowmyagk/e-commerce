@@ -6,26 +6,26 @@
   font-family: "Segoe UI", sans-serif;
 }
 
-/* Background overlay */
+/* Dark overlay background */
 body {
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
 }
 
-/* Center modal */
+/* Main container (modal) */
 div {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
-  width: 400px;
+
+  width: 420px;
   padding: 30px;
 
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
 
   display: flex;
   flex-direction: column;
@@ -34,22 +34,27 @@ div {
 
 /* Title */
 h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 20px;
   color: #333;
+  margin-bottom: 10px;
 }
 
-/* Subtitle */
+/* Email text */
 p {
-  font-size: 14px;
+  font-size: 13px;
   color: #666;
-  margin-bottom: 20px;
   text-align: center;
+  margin-bottom: 20px;
 }
 
-/* OTP Inputs row */
+/* OTP input container (IMPORTANT FIX) */
+div input {
+  display: inline-block;
+}
+
+/* OTP Inputs */
 input {
-  width: 45px;
+  width: 42px;
   height: 50px;
   margin: 5px;
   border-radius: 6px;
@@ -61,14 +66,14 @@ input {
   transition: 0.2s;
 }
 
-/* Focus effect */
+/* Focus */
 input:focus {
   border-color: #ff6f00;
   outline: none;
-  box-shadow: 0 0 5px rgba(255, 111, 0, 0.4);
+  box-shadow: 0 0 6px rgba(255, 111, 0, 0.4);
 }
 
-/* Submit button */
+/* Verify button */
 button {
   width: 100%;
   margin-top: 20px;
@@ -87,32 +92,31 @@ button {
   transition: 0.2s;
 }
 
-/* Hover */
 button:hover {
   background: #e64a19;
 }
 
-/* Resend button (second button) */
-button:last-of-type {
-  background: transparent;
-  color: #ff5722;
-  margin-top: 10px;
-}
-
-/* Timer text */
+/* Timer */
 p:last-of-type {
   margin-top: 10px;
   font-size: 13px;
+}
+
+/* Resend button */
+button:last-of-type {
+  background: transparent;
+  color: #ff5722;
 }
 
 /* Responsive */
 @media (max-width: 450px) {
   div {
     width: 90%;
+    padding: 20px;
   }
 
   input {
-    width: 38px;
+    width: 36px;
     height: 45px;
   }
 }
