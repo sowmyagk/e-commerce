@@ -34,7 +34,7 @@ function generateInvoice(order) {
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text(`Invoice No: INV-${order._id.toString().slice(-6)}`, 400, 70)
+      .text(`Invoice No: INV-${order?._id?.toString().slice(-6) || "000000"}`, 400, 70)
       .text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 400, 85);
 
     // LINE
@@ -51,10 +51,9 @@ function generateInvoice(order) {
     doc
       .font("Helvetica")
       .fontSize(11)
-      .text(order.email, 40, 160);
+      .text(order?.email || "N/A", 40, 160);
 
-    // Optional address (if available)
-    if (order.address) {
+    if (order?.address) {
       doc.text(order.address, 40, 175);
     }
 
@@ -79,19 +78,25 @@ function generateInvoice(order) {
     // 🛒 ITEMS
     // =========================
     let y = tableTop + 35;
-    doc.font("Helvetica");
-
     let subtotal = 0;
 
-    order.items.forEach((item, i) => {
-      const qty = item.quantity || 1;
-      const price = item.price || 0;
+    doc.font("Helvetica");
+
+    (order?.items || []).forEach((item, i) => {
+      const qty = item?.quantity || 1;
+      const price = item?.price || 0;
       const total = price * qty;
 
       subtotal += total;
 
+      // Auto page break
+      if (y > 700) {
+        doc.addPage();
+        y = 50;
+      }
+
       doc.text(i + 1, 45, y);
-      doc.text(item.name, 80, y, { width: 200 });
+      doc.text(item?.name || "Item", 80, y, { width: 200 });
       doc.text(price.toFixed(2), 300, y, { width: 60, align: "right" });
       doc.text(qty, 380, y, { width: 40, align: "right" });
       doc.text(total.toFixed(2), 450, y, { width: 80, align: "right" });
@@ -120,7 +125,7 @@ function generateInvoice(order) {
       .fontSize(13)
       .text(`Grand Total: ₹${totalAmount.toFixed(2)}`, 300, y + 90, {
         align: "right",
-        width: 250
+        width: 250,
       });
 
     // =========================
