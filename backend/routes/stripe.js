@@ -19,7 +19,7 @@ router.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Order ID & amount required" });
     }
 
-    // 🔥 Fetch order (IMPORTANT)
+    // 🔥 Fetch order
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
@@ -29,7 +29,7 @@ router.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       mode: "payment",
 
-      // ✅ Ensures correct email in Stripe
+      // ✅ attach email
       customer_email: order.email,
 
       line_items: [
@@ -63,9 +63,11 @@ router.post("/create-checkout-session", async (req, res) => {
 
 
 // ============================================
-// ✅ STRIPE WEBHOOK
+// ✅ STRIPE WEBHOOK (MAIN FIX)
 // ============================================
 router.post("/webhook", async (req, res) => {
+  console.log("🔥 WEBHOOK HIT");
+
   const sig = req.headers["stripe-signature"];
 
   let event;
@@ -81,13 +83,16 @@ router.post("/webhook", async (req, res) => {
     return res.sendStatus(400);
   }
 
+  console.log("✅ Event type:", event.type);
+
   try {
     if (event.type === "checkout.session.completed") {
+      console.log("💰 PAYMENT SUCCESS EVENT RECEIVED");
+
       const session = event.data.object;
 
       const orderId = session.metadata?.orderId;
-
-      console.log("✅ Payment successful for order:", orderId);
+      console.log("📦 Order ID:", orderId);
 
       if (!orderId) return res.sendStatus(200);
 
