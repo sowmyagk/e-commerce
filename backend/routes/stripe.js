@@ -62,7 +62,6 @@ router.post("/create-checkout-session", async (req, res) => {
 // ============================================
 router.post(
   "/webhook",
-  express.raw({ type: "application/json" }),
   async (req, res) => {
     try {
       const event = req.body;
@@ -87,9 +86,7 @@ router.post(
           return res.sendStatus(200);
         }
 
-        // ✅ Generate invoice PDF
-        const filePath = await generateInvoice(order);
-
+       
         // ✅ Send email with invoice
         const pdfBuffer = await generateInvoice(order);
           await sendInvoiceEmail(order.email, pdfBuffer);
