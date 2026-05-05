@@ -4,11 +4,9 @@ const Stripe = require("stripe");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// ✅ Import your utils (make sure these files exist)
 const generateInvoice = require("../utils/generateInvoice");
 const { sendInvoiceEmail } = require("../utils/sendEmail");
 const Order = require("../models/Order");
-
 
 // ============================================
 // ✅ CREATE CHECKOUT SESSION
@@ -23,7 +21,6 @@ router.post("/create-checkout-session", async (req, res) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-
       line_items: [
         {
           price_data: {
@@ -31,15 +28,13 @@ router.post("/create-checkout-session", async (req, res) => {
             product_data: {
               name: "Order Payment",
             },
-            unit_amount: totalAmount * 100, // ✅ convert to paise
+            unit_amount: totalAmount * 100,
           },
           quantity: 1,
         },
       ],
-
       mode: "payment",
 
-      // ✅ IMPORTANT → used in webhook
       metadata: {
         orderId: orderId,
       },
@@ -58,49 +53,52 @@ router.post("/create-checkout-session", async (req, res) => {
 
 
 // ============================================
-// ✅ STRIPE WEBHOOK (PAYMENT SUCCESS)
+// ✅ STRIPE WEBHOOK (FIXED)
 // ============================================
-router.post(
-  "/webhook",
-  async (req, res) => {
-    try {
-      const event = req.body;
+router.post("/webhook", async (req, res) => {
+  const sig = req.headers["stripe-signature"];
 
-      if (event.type === "checkout.session.completed") {
-        const session = event.data.object;
+  let event;
 
-        const orderId = session.metadata?.orderId;
-
-        console.log("✅ Payment successful for order:", orderId);
-
-        if (!orderId) {
-          console.log("❌ No orderId found in metadata");
-          return res.sendStatus(200);
-        }
-
-        // ✅ Get order from DB
-        const order = await Order.findById(orderId);
-
-        if (!order) {
-          console.log("❌ Order not found");
-          return res.sendStatus(200);
-        }
-
-       
-        // ✅ Send email with invoice
-        const pdfBuffer = await generateInvoice(order);
-          await sendInvoiceEmail(order.email, pdfBuffer);
-
-        console.log("📩 Invoice sent successfully!");
-      }
-
-      res.sendStatus(200);
-
-    } catch (err) {
-      console.log("❌ Webhook Error:", err.message);
-      res.sendStatus(400);
-    }
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET   // 🔴 MUST ADD IN .env
+    );
+  } catch (err) {
+    console.log("❌ Signature verification failed:", err.message);
+    return res.sendStatus(400);
   }
-);
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      const orderId = session.metadata?.orderId;
+
+      console.log("✅ Payment successful for order:", orderId);
+
+      if (!orderId) return res.sendStatus(200);
+
+      const order = await Order.findById(orderId);
+      if (!order) return res.sendStatus(200);
+
+      // ✅ Generate invoice
+      const pdfBuffer = await generateInvoice(order);
+
+      // ✅ Send email
+      await sendInvoiceEmail(order.email, pdfBuffer);
+
+      console.log("📩 Invoice sent successfully!");
+    }
+
+    res.sendStatus(200);
+
+  } catch (err) {
+    console.log("❌ Webhook Error:", err.message);
+    res.sendStatus(400);
+  }
+});
 
 module.exports = router;
