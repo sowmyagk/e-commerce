@@ -6,9 +6,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 router.post("/create-checkout-session", async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.create({
-      ui_mode: "hosted_page", 
+    const { orderId } = req.body; // ✅ IMPORTANT
 
+    if (!orderId) {
+      return res.status(400).json({ error: "Order ID is required" });
+    }
+
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
 
       line_items: [
@@ -16,9 +20,9 @@ router.post("/create-checkout-session", async (req, res) => {
           price_data: {
             currency: "inr",
             product_data: {
-              name: "Test Product",
+              name: "Order Payment",
             },
-            unit_amount: 50000, // ₹500
+            unit_amount: 50000, // You can replace with dynamic amount later
           },
           quantity: 1,
         },
@@ -26,17 +30,17 @@ router.post("/create-checkout-session", async (req, res) => {
 
       mode: "payment",
 
-      success_url: "http://localhost:5173/success",
-      cancel_url: "http://localhost:5173/cancel",
+      // ✅ FIX HERE (VERY IMPORTANT)
+      success_url: `${process.env.CLIENT_URL}/success?orderId=${orderId}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
 
-    res.json({ url: session.url }); 
+    res.json({ url: session.url });
+
   } catch (error) {
-    console.log(error);
+    console.log("❌ Stripe Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 module.exports = router;
-
-

@@ -7,21 +7,49 @@ function Payment() {
   const location = useLocation();
   const { address } = location.state || {};
 
-  const handlePayment = async () => {
-    const stripe = await stripePromise;
+ const handlePayment = async () => {
+  const stripe = await stripePromise;
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ address })
-    });
+  const user = JSON.parse(localStorage.getItem("user"));
 
-    const data = await res.json();
+  // ✅ 1. Get cart
+  const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
+  const cart = await cartRes.json();
 
-    window.location.href = data.url;
-  };
+  const totalAmount = cart.reduce((sum, item) => {
+    return sum + item.price * item.quantity;
+  }, 0);
+
+  // ✅ 2. Create order FIRST
+  const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: user.email,
+      items: cart,
+      totalAmount
+    })
+  });
+
+  const orderData = await orderRes.json();
+
+  const orderId = orderData.order._id; // 👈 IMPORTANT
+
+  // ✅ 3. Send orderId to backend (Stripe)
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ orderId }) // 👈 PASS ORDER ID
+  });
+
+  const data = await res.json();
+
+  window.location.href = data.url;
+};
 
   return (
     <div style={{ padding: "20px" }}>

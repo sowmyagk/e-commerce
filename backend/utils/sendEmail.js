@@ -16,7 +16,7 @@ async function sendEmail(to, otp, pdfBuffer = null) {
         ? [
             {
               filename: "invoice.pdf",
-              content: pdfBuffer.toString("base64"),
+              content: pdfBuffer,
             },
           ]
         : [],

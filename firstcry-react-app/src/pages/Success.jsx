@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 function Success() {
 
-  const location = useLocation();   // ✅ get orderId from navigation
-  const orderId = location.state?.orderId;
-
   useEffect(() => {
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("orderId"); // ✅ GET FROM URL
 
     if (orderId) {
       fetch(`${import.meta.env.VITE_API_URL}/api/send-invoice/${orderId}`, {
@@ -16,7 +15,7 @@ function Success() {
       .catch(err => console.log(err));
     }
 
-  }, [orderId]);
+  }, []);
 
   return (
     <div>

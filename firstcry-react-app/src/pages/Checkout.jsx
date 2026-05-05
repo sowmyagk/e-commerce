@@ -30,18 +30,19 @@ function Checkout() {
   };
 
   const handleOrder = async () => {
-    try {
+  try {
 
-      // ✅ FIXED (NEW CODE) → FETCH CART
-      const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
-      const cart = await cartRes.json();
+    const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
+    const cart = await cartRes.json();
 
-      // ✅ FIXED (NEW CODE) → CALCULATE TOTAL
-      const totalAmount = cart.reduce((sum, item) => {
-        return sum + item.price * item.quantity;
-      }, 0);
+    const totalAmount = cart.reduce((sum, item) => {
+      return sum + item.price * item.quantity;
+    }, 0);
 
-      // ✅ FIXED (UPDATED BODY)
+    // ✅ 🔥 IMPORTANT CHANGE STARTS HERE
+    if (payment === "cod") {
+
+      // 🟢 COD → create order directly
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
@@ -57,17 +58,38 @@ function Checkout() {
       const data = await res.json();
 
       if (data.success) {
-        alert("Order placed successfully");
-        navigate("/orders");
-      } else {
+
+  const orderId = data.order._id; // 👈 get order id
+
+  // ✅ send GST invoice
+  await fetch(`${import.meta.env.VITE_API_URL}/api/send-invoice/${orderId}`, {
+    method: "POST"
+  });
+
+  alert("Order placed & Invoice sent 📩");
+
+  navigate("/orders");
+} else {
         alert(data.message);
       }
 
-    } catch (err) {
-      console.log(err);
-      alert("Order failed");
+    } else {
+
+      // 🔵 UPI / CARD → go to payment page
+      navigate("/payment", {
+        state: {
+          address: form   // 👈 pass address if needed
+        }
+      });
+
     }
-  };
+    // ✅ 🔥 IMPORTANT CHANGE ENDS HERE
+
+  } catch (err) {
+    console.log(err);
+    alert("Order failed");
+  }
+};
 
   return (
     <div className="checkout-container">
