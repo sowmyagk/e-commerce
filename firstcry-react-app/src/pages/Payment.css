@@ -1,74 +1,119 @@
-/* Page background */
-body {
-  background-color: #f1f3f6;
+/* Page */
+.payment-page {
+  background: #f1f3f6;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
 }
 
-/* Title */
-h2 {
-  margin-bottom: 15px;
-  font-size: 20px;
+/* Header */
+.payment-header {
+  padding: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Address Card */
+.address-card {
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deliver-to {
   font-weight: 600;
 }
 
-/* Container spacing */
-div {
-  max-width: 500px;
-  margin: auto;
+.address-text {
+  font-size: 13px;
+  color: #555;
 }
 
-/* Payment box (main cards) */
-.payment-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #e0e0e0;
-  padding: 15px 18px;
-  margin: 12px 0;
-  border-radius: 10px;
+/* Change Button */
+.change-btn {
+  border: 1px solid #ff5a5f;
+  background: transparent;
+  color: #ff5a5f;
+  padding: 6px 12px;
+  border-radius: 5px;
   cursor: pointer;
-  background: #ffffff;
-  transition: all 0.2s ease;
 }
 
-/* Hover effect */
+/* Offer */
+.offer-card {
+  background: #fff3e0;
+  margin: 0 15px 15px;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.offer-title {
+  font-weight: 600;
+}
+
+.offer-desc {
+  font-size: 13px;
+  color: #555;
+}
+
+/* Title */
+.payment-title {
+  margin: 15px;
+  font-size: 18px;
+}
+
+/* Payment Boxes */
+.payment-box {
+  background: white;
+  margin: 10px 15px;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+  transition: 0.2s;
+}
+
 .payment-box:hover {
   background: #f9fafb;
-  transform: scale(1.01);
 }
 
-/* Add arrow on right side */
+/* Arrow */
 .payment-box::after {
   content: "›";
   font-size: 18px;
   color: #888;
 }
 
-/* Add spacing between text and icon look */
-.payment-box span {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Icons */
+.icon {
+  margin-right: 10px;
+  font-size: 18px;
 }
 
-/* Optional: highlight clickable ones */
-.payment-box:active {
-  transform: scale(0.98);
-}
-
-/* Footer icons section (like screenshot bottom row) */
+/* Footer */
 .payment-footer {
   display: flex;
   justify-content: space-around;
-  margin-top: 30px;
   text-align: center;
-  color: #555;
-  font-size: 12px;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
 }
 
-/* Footer items */
-.payment-footer div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.footer-icon {
+  font-size: 20px;
+  margin-bottom: 5px;
+  color: #2874f0;
+}
+
+.payment-footer p {
+  font-size: 12px;
+  color: #555;
 }
