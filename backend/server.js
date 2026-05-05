@@ -14,6 +14,9 @@ const stripeRoutes = require("./routes/stripe");
 const sendEmail = require("./utils/sendEmail");
 const User = require("./models/User");
 
+const generateInvoice = require("./utils/generateInvoice");
+const Order = require("./models/Order");
+
 const app = express();
 
 cloudinary.config({
@@ -122,6 +125,33 @@ app.post("/api/otp/verify", async (req, res) => {
     return res.json({ success: false });
   }
 });
+
+
+
+
+// 📩 SEND INVOICE
+app.post("/api/send-invoice/:id", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    // 📄 Generate PDF
+    const pdfBuffer = await generateInvoice(order);
+
+    // 📩 Send email
+    await sendEmail(order.email, null, pdfBuffer);
+
+    res.json({ success: true, message: "Invoice sent to email" });
+
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false });
+  }
+});
+
 
 const PORT = process.env.PORT || 3001;
 

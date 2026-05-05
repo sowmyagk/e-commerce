@@ -93,10 +93,19 @@ function Checkout() {
         <label>
           <input
             type="radio"
-            value="online"
+            value="upi"
             onChange={(e) => setPayment(e.target.value)}
           />
-          Online Payment
+          UPI
+        </label>
+      
+       <label>
+          <input
+            type="radio"
+            value="card"
+            onChange={(e) => setPayment(e.target.value)}
+          />
+          Card
         </label>
       </div>
 
