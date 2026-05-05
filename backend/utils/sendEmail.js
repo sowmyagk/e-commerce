@@ -31,7 +31,7 @@ async function sendEmail(to, otp, pdfBuffer = null) {
   }
 }
 
-module.exports = sendEmail;     
+  
 // =====================================
 // ✅ SEND INVOICE EMAIL
 // =====================================
@@ -64,6 +64,6 @@ async function sendInvoiceEmail(to, pdfBuffer) {
 }
 
 module.exports = {
-  sendOTPEmail,
+  sendEmail,   
   sendInvoiceEmail,
 };
