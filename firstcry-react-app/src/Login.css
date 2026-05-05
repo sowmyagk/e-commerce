@@ -159,8 +159,6 @@ body {
   }
 }
 
-
-/* ADMIN BUTTON (TOP RIGHT) */
 .admin-btn {
   position: absolute;
   top: 20px;
@@ -168,12 +166,11 @@ body {
   background: red;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
   border-radius: 4px;
-}
 
-.admin-btn:hover {
-  background: darkred;
+  width: auto;        /* ✅ IMPORTANT FIX */
+  display: inline-block; /* ✅ prevents full width */
 }
