@@ -2,44 +2,113 @@ const PDFDocument = require("pdfkit");
 
 function generateInvoice(order) {
   return new Promise((resolve) => {
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ margin: 40 });
 
     let buffers = [];
-
     doc.on("data", buffers.push.bind(buffers));
     doc.on("end", () => {
-      const pdfData = Buffer.concat(buffers);
-      resolve(pdfData);
+      resolve(Buffer.concat(buffers));
     });
 
-    // 🧾 GST Invoice Content
-    doc.fontSize(20).text("GST INVOICE", { align: "center" });
+    // ===============================
+    // 🟥 HEADER (LIKE NETFLIX STYLE)
+    // ===============================
+    doc
+      .fontSize(20)
+      .fillColor("#e50914")
+      .text("FirstCry Clone", { align: "left" });
+
+    doc
+      .fontSize(10)
+      .fillColor("black")
+      .text("Kochi, India", { align: "right" })
+      .text("support@firstcryclone.com", { align: "right" });
 
     doc.moveDown();
-    doc.fontSize(12).text(`Order ID: ${order._id}`);
-    doc.text(`Customer: ${order.email}`);
+
+    // ===============================
+    // 🧾 TITLE
+    // ===============================
+    doc
+      .fontSize(18)
+      .fillColor("black")
+      .text("Payment Receipt", { align: "left" });
+
+    doc.moveDown();
+
+    // ===============================
+    // 📄 ORDER DETAILS
+    // ===============================
+    doc.fontSize(12);
+
+    doc.text(`Invoice ID: ${order._id}`);
     doc.text(`Date: ${new Date().toLocaleDateString()}`);
+    doc.text(`Customer: ${order.email}`);
 
     doc.moveDown();
 
-    // 🛒 Products
-    doc.text("Products:");
+    // ===============================
+    // 🛒 TABLE HEADER
+    // ===============================
+    const tableTop = doc.y;
+
+    doc
+      .fontSize(12)
+      .text("Item", 50, tableTop)
+      .text("Description", 120, tableTop)
+      .text("Unit Cost", 300, tableTop)
+      .text("Qty", 380, tableTop)
+      .text("Line Total", 430, tableTop);
+
+    doc.moveDown();
+
+    // ===============================
+    // 🛍️ PRODUCTS LIST
+    // ===============================
+    let y = doc.y;
+
     order.items.forEach((item, i) => {
-      doc.text(`${i + 1}. ${item.name} - ₹${item.price} x ${item.qty}`);
+      const lineTotal = item.price * item.quantity;
+
+      doc
+        .fontSize(11)
+        .text(i + 1, 50, y)
+        .text(item.name || "Product", 120, y)
+        .text(`₹${item.price}`, 300, y)
+        .text(item.quantity, 380, y)
+        .text(`₹${lineTotal}`, 430, y);
+
+      y += 20;
     });
 
     doc.moveDown();
 
+    // ===============================
+    // 💰 TOTALS
+    // ===============================
     const subtotal = order.totalAmount;
     const gst = subtotal * 0.18;
     const total = subtotal + gst;
 
-    doc.text(`Subtotal: ₹${subtotal}`);
-    doc.text(`GST (18%): ₹${gst.toFixed(2)}`);
-    doc.text(`Total: ₹${total.toFixed(2)}`);
+    doc.moveDown();
+
+    doc.text(`Subtotal: ₹${subtotal}`, { align: "right" });
+    doc.text(`GST (18%): ₹${gst.toFixed(2)}`, { align: "right" });
+
+    doc
+      .fontSize(14)
+      .text(`Total Amount: ₹${total.toFixed(2)}`, {
+        align: "right",
+      });
 
     doc.moveDown();
-    doc.text("Thank you for shopping with us!");
+
+    // ===============================
+    // 🙏 FOOTER
+    // ===============================
+    doc
+      .fontSize(12)
+      .text("Thank you for shopping with us!", { align: "center" });
 
     doc.end();
   });
