@@ -12,8 +12,8 @@ const orderRoutes = require("./routes/orderRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const stripeRoutes = require("./routes/stripe");
 
-// UTILS
-const sendEmail = require("./utils/sendEmail");
+// UTILS (✅ FIXED IMPORT)
+const { sendOTPEmail, sendInvoiceEmail } = require("./utils/sendEmail");
 const generateInvoice = require("./utils/generateInvoice");
 
 // MODELS
@@ -31,13 +31,10 @@ cloudinary.config({
 });
 
 
-// 🔧 MIDDLEWARE
-app.use(cors());
-app.use(express.json());
-
-
+// 🔧 MIDDLEWARE (⚠️ ORDER IMPORTANT)
 app.use("/api/payment/webhook", express.raw({ type: "application/json" }));
-
+app.use(express.json());
+app.use(cors());
 
 
 // 🟢 MONGODB CONNECTION
@@ -61,7 +58,7 @@ app.get("/", (req, res) => {
 
 
 // =========================
-// 🔢 OTP STORE
+// 🔢 OTP STORE (TEMP MEMORY)
 // =========================
 let otpStore = {};
 
@@ -79,7 +76,7 @@ app.post("/api/otp/send", async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    // ⚠️ prevent generating new OTP repeatedly
+    // Prevent multiple OTP spam
     if (otpStore[email] && otpStore[email].expires > Date.now()) {
       console.log("⚠️ Using existing OTP:", otpStore[email].otp);
       return res.json({
@@ -88,18 +85,18 @@ app.post("/api/otp/send", async (req, res) => {
       });
     }
 
-    // 🔢 Generate OTP
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     otpStore[email] = {
       otp,
-      expires: Date.now() + 5 * 60 * 1000 // 5 mins
+      expires: Date.now() + 5 * 60 * 1000
     };
 
     console.log("🔢 OTP:", otp, "EMAIL:", email);
 
-    // 📩 Send OTP email
-    const emailRes = await sendEmail(email, otp);
+    // ✅ SEND EMAIL (FIXED)
+    const emailRes = await sendOTPEmail(email, otp);
 
     if (emailRes?.error) {
       return res.json({
@@ -111,7 +108,7 @@ app.post("/api/otp/send", async (req, res) => {
     return res.json({
       success: true,
       isNewUser: !user,
-      otp // ⚠️ REMOVE IN PRODUCTION
+      otp // ⚠️ remove in production
     });
 
   } catch (err) {
@@ -130,32 +127,19 @@ app.post("/api/otp/verify", async (req, res) => {
 
     const record = otpStore[email];
 
-    console.log("👉 Entered OTP:", otp);
-    console.log("👉 Stored OTP:", record?.otp);
-
     if (!record) {
-      return res.json({
-        success: false,
-        message: "No OTP found"
-      });
+      return res.json({ success: false, message: "No OTP found" });
     }
 
     if (record.expires < Date.now()) {
       delete otpStore[email];
-      return res.json({
-        success: false,
-        message: "OTP expired"
-      });
+      return res.json({ success: false, message: "OTP expired" });
     }
 
     if (record.otp !== otp) {
-      return res.json({
-        success: false,
-        message: "Invalid OTP"
-      });
+      return res.json({ success: false, message: "Invalid OTP" });
     }
 
-    // ✅ Create user if new
     let user = await User.findOne({ email });
 
     if (!user && name && phone) {
@@ -175,36 +159,27 @@ app.post("/api/otp/verify", async (req, res) => {
 
 
 // =========================
-// 📩 SEND INVOICE (PDF)
+// 📩 SEND INVOICE (MANUAL - COD)
 // =========================
 app.post("/api/send-invoice/:id", async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
     if (!order) {
-      return res.json({
-        success: false,
-        message: "Order not found"
-      });
+      return res.json({ success: false, message: "Order not found" });
     }
 
-    // ✅ Ensure email exists
-    const email = order.email;
-
-    if (!email) {
-      return res.json({
-        success: false,
-        message: "Email not found in order"
-      });
+    if (!order.email) {
+      return res.json({ success: false, message: "Email missing" });
     }
 
-    console.log("📧 Sending invoice to:", email);
+    console.log("📧 Sending invoice to:", order.email);
 
-    // 📄 Generate PDF
+    // Generate PDF
     const pdfBuffer = await generateInvoice(order);
 
-    // 📩 Send email with PDF
-    const emailRes = await sendEmail(email, null, pdfBuffer);
+    // ✅ SEND EMAIL (FIXED)
+    const emailRes = await sendInvoiceEmail(order.email, pdfBuffer);
 
     if (emailRes?.error) {
       return res.json({
