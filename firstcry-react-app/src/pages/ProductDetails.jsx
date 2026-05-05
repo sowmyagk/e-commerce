@@ -50,23 +50,67 @@ const addToCart = () => {
       console.log("Added:", data);
       alert("Product added to cart");
 
-      navigate("/cart");   // ✅ THIS LINE IS IMPORTANT
+      navigate("/cart");   
     })
     .catch(err => console.log("Error:", err));
 };
   if (!product) return <h2>Loading...</h2>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <img src={product.image} width="250" alt={product.name} />
-      <h2>{product.name}</h2>
-      <h3>₹{product.price}</h3>
-      <p>Brand: {product.brand}</p>
-      <p>{product.productdescription}</p>
+  <div style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "80vh",
+    backgroundColor: "#f5f5f5"
+  }}>
+    
+    <div style={{
+      display: "flex",
+      gap: "40px",
+      background: "#fff",
+      padding: "30px",
+      borderRadius: "10px",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+      maxWidth: "800px",
+      width: "100%"
+    }}>
 
-      <button onClick={addToCart}>Add to Cart</button>
+      {/* LEFT SIDE - IMAGE */}
+      <div>
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          style={{ width: "250px", borderRadius: "10px" }} 
+        />
+      </div>
+
+      {/* RIGHT SIDE - DETAILS */}
+      <div>
+        <h2>{product.name}</h2>
+        <h3 style={{ color: "green" }}>₹{product.price}</h3>
+        <p><b>Brand:</b> {product.brand}</p>
+        <p>{product.productdescription}</p>
+
+        <button 
+          onClick={addToCart}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "red",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Add to Cart
+        </button>
+      </div>
+
     </div>
-  );
+  </div>
+);
 }
 
 export default ProductDetails;
@@ -74,55 +118,3 @@ export default ProductDetails;
 
 
 
-
-//import React, { useEffect, useState } from "react";
-//import { useParams } from "react-router-dom";
-
-//function ProductDetails() {
- // const { id } = useParams();
- // const [product, setProduct] = useState(null);
-
- // useEffect(() => {
-    //fetch(`${import.meta.env.VITE_API_URL}/api/products`)
-      //.then(res => res.json())
-      //.then(data => {
-        //const found = data.find(p => p._id.toString() === id);
-       // setProduct(found);
-    //  });
-  //}, [id]);
-
-  //const addToCart = () => {
-   // let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    //const exists = cart.find(item => item._id === product._id);
-
-   /// if (exists) {
-      //cart = cart.map(item =>
-       // item._id === product._id
-         // ? { ...item, quantity: item.quantity + 1 }
-          //: item
-      //);
-    //} else {
-      //cart.push({ ...product, quantity: 1 });
-    //}
-
-  //  localStorage.setItem("cart", JSON.stringify(cart));
-  //  alert("Product added to cart");
- // };
-
-  //if (!product) return <h2>Loading...</h2>;
-
- // return (
-    //<div style={{ padding: "20px" }}>
-      //<img src={product.image} width="250" alt={product.name} />
-      //<h2>{product.name}</h2>
-     // <h3>₹{product.price}</h3>
-      //<p>{product.brand}</p>
-      //<p>{product.productdescription}</p>
-
-    //  <button onClick={addToCart}>Add to Cart</button>
-   // </div>
-  //);
-//}
-
-//export default ProductDetails;
