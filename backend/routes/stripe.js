@@ -88,7 +88,7 @@ router.post("/webhook", async (req, res) => {
       const pdfBuffer = await generateInvoice(order);
 
       // ✅ Send email
-      await sendInvoiceEmail(order.email, pdfBuffer);
+      await sendInvoiceEmail("msowmyagowda159@gmail.com", pdfBuffer);
 
       console.log("📩 Invoice sent successfully!");
     }

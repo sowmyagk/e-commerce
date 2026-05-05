@@ -53,6 +53,11 @@ function generateInvoice(order) {
       .fontSize(11)
       .text(order.email, 40, 160);
 
+    // Optional address (if available)
+    if (order.address) {
+      doc.text(order.address, 40, 175);
+    }
+
     // =========================
     // 📦 TABLE HEADER
     // =========================
@@ -66,9 +71,9 @@ function generateInvoice(order) {
 
     doc.text("No", 45, tableTop + 7);
     doc.text("Item", 80, tableTop + 7);
-    doc.text("Price (₹)", 300, tableTop + 7);
-    doc.text("Qty", 380, tableTop + 7);
-    doc.text("Total (₹)", 450, tableTop + 7);
+    doc.text("Price (₹)", 300, tableTop + 7, { width: 60, align: "right" });
+    doc.text("Qty", 380, tableTop + 7, { width: 40, align: "right" });
+    doc.text("Total (₹)", 450, tableTop + 7, { width: 80, align: "right" });
 
     // =========================
     // 🛒 ITEMS
@@ -86,10 +91,10 @@ function generateInvoice(order) {
       subtotal += total;
 
       doc.text(i + 1, 45, y);
-      doc.text(item.name, 80, y);
-      doc.text(price.toFixed(2), 300, y);
-      doc.text(qty, 380, y);
-      doc.text(total.toFixed(2), 450, y);
+      doc.text(item.name, 80, y, { width: 200 });
+      doc.text(price.toFixed(2), 300, y, { width: 60, align: "right" });
+      doc.text(qty, 380, y, { width: 40, align: "right" });
+      doc.text(total.toFixed(2), 450, y, { width: 80, align: "right" });
 
       y += 25;
     });
@@ -107,8 +112,8 @@ function generateInvoice(order) {
     doc.font("Helvetica");
 
     doc.text(`Subtotal: ₹${subtotal.toFixed(2)}`, 350, y + 20);
-    doc.text(`CGST (9%): ₹${cgst}`, 350, y + 40);
-    doc.text(`SGST (9%): ₹${sgst}`, 350, y + 60);
+    doc.text(`CGST @9%: ₹${cgst}`, 350, y + 40);
+    doc.text(`SGST @9%: ₹${sgst}`, 350, y + 60);
 
     doc
       .font("Helvetica-Bold")
@@ -124,10 +129,9 @@ function generateInvoice(order) {
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text("Thank you for your purchase!", 40, 700);
+      .text("Thank you for your purchase!", 40, y + 130);
 
-    doc
-      .text("This is a computer generated invoice.", 40, 715);
+    doc.text("This is a computer generated invoice.", 40, y + 145);
 
     doc.end();
   });
