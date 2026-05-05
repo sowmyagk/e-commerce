@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import "./payment.css";
+import "./Payment.css";
 
 // ✅ Icons
 import { 
