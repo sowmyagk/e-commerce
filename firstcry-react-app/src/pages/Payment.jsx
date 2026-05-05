@@ -18,16 +18,27 @@ const stripePromise = loadStripe("pk_test_51TJoSzRcOSTL52HSy6AzzMebz2hoVUyTzJ1nd
 
 function Payment() {
   const location = useLocation();
-  const { address } = location.state || {};
+  const address = location?.state?.address || {};
 
   const handlePayment = async () => {
+  try {
     const stripe = await stripePromise;
 
     const user = JSON.parse(localStorage.getItem("user"));
 
+    if (!user || !user.email) {
+      alert("User not logged in");
+      return;
+    }
+
     // ✅ Get cart
     const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
     const cart = await cartRes.json();
+
+    if (!cart || cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
 
     const totalAmount = cart.reduce((sum, item) => {
       return sum + item.price * item.quantity;
@@ -47,6 +58,12 @@ function Payment() {
     });
 
     const orderData = await orderRes.json();
+
+    if (!orderData.success) {
+      alert("Order creation failed");
+      return;
+    }
+
     const orderId = orderData.order._id;
 
     // ✅ Stripe session
@@ -60,14 +77,19 @@ function Payment() {
 
     const data = await res.json();
 
-if (!data.url) {
-  alert("Payment failed");
-  console.log("Stripe error:", data);
-  return;
-}
+    if (!data.url) {
+      alert("Payment failed");
+      console.log(data);
+      return;
+    }
 
-window.location.href = data.url;
-  };
+    window.location.href = data.url;
+
+  } catch (err) {
+    console.log("❌ Payment error:", err);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <div className="payment-page">
@@ -82,7 +104,7 @@ window.location.href = data.url;
         <div>
           <p className="deliver-to">Deliver to Sowmya, 574211</p>
           <p className="address-text">
-            {address || "Kudkunja House Sarapady Post And Village"}
+            {address.address || "Kudkunja House Sarapady Post And Village"}
           </p>
         </div>
         <button className="change-btn">CHANGE</button>
