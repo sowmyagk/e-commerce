@@ -53,6 +53,14 @@ console.log("API URL:", import.meta.env.VITE_API_URL);
   return (
     <div className="main-box">
 
+  {/* ✅ ADMIN LOGIN BUTTON */}
+  <button 
+    className="admin-btn"
+    onClick={() => navigate("/adminlogin")}
+  >
+    Admin Login
+  </button>
+
       <div className="offer">
         <img
           src="https://cdn.fcglcdn.com/brainbees/images/m/login_revamp_banner_mobile.webp"
