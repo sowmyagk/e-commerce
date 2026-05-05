@@ -19,8 +19,19 @@ router.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Order ID & amount required" });
     }
 
+    // 🔥 Fetch order (IMPORTANT)
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
+      mode: "payment",
+
+      // ✅ Ensures correct email in Stripe
+      customer_email: order.email,
+
       line_items: [
         {
           price_data: {
@@ -33,7 +44,6 @@ router.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      mode: "payment",
 
       metadata: {
         orderId: orderId,
@@ -53,7 +63,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
 
 // ============================================
-// ✅ STRIPE WEBHOOK (FIXED)
+// ✅ STRIPE WEBHOOK
 // ============================================
 router.post("/webhook", async (req, res) => {
   const sig = req.headers["stripe-signature"];
@@ -64,7 +74,7 @@ router.post("/webhook", async (req, res) => {
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET   // 🔴 MUST ADD IN .env
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     console.log("❌ Signature verification failed:", err.message);
@@ -82,13 +92,19 @@ router.post("/webhook", async (req, res) => {
       if (!orderId) return res.sendStatus(200);
 
       const order = await Order.findById(orderId);
-      if (!order) return res.sendStatus(200);
 
-      // ✅ Generate invoice
+      if (!order) {
+        console.log("❌ Order not found");
+        return res.sendStatus(200);
+      }
+
+      console.log("📧 Sending invoice to:", order.email);
+
+      // ✅ Generate invoice (BUFFER)
       const pdfBuffer = await generateInvoice(order);
 
       // ✅ Send email
-      await sendInvoiceEmail("msowmyagowda159@gmail.com", pdfBuffer);
+      await sendInvoiceEmail(order.email, pdfBuffer);
 
       console.log("📩 Invoice sent successfully!");
     }
