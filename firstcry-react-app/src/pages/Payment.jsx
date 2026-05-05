@@ -3,14 +3,14 @@ import { loadStripe } from "@stripe/stripe-js";
 import "./Payment.css";
 
 // ✅ Icons
-import { 
-  FaCreditCard, 
-  FaUniversity, 
-  FaMoneyBillWave, 
-  FaLock, 
-  FaUndo, 
-  FaShieldAlt, 
-  FaCheckCircle 
+import {
+  FaCreditCard,
+  FaUniversity,
+  FaMoneyBillWave,
+  FaLock,
+  FaUndo,
+  FaShieldAlt,
+  FaCheckCircle
 } from "react-icons/fa";
 import { SiGooglepay } from "react-icons/si";
 
@@ -18,78 +18,97 @@ const stripePromise = loadStripe("pk_test_51TJoSzRcOSTL52HSy6AzzMebz2hoVUyTzJ1nd
 
 function Payment() {
   const location = useLocation();
+
+  // ✅ SAFE ADDRESS HANDLING
   const address = location?.state?.address || {};
 
   const handlePayment = async () => {
-  try {
-    const stripe = await stripePromise;
+    try {
+      const stripe = await stripePromise;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+      // ✅ SAFE USER CHECK
+      const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!user || !user.email) {
-      alert("User not logged in");
-      return;
+      if (!user || !user.email) {
+        alert("User not logged in");
+        return;
+      }
+
+      // ✅ FETCH CART
+      const cartRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/cart/${user.email}`
+      );
+
+      if (!cartRes.ok) {
+        alert("Failed to fetch cart");
+        return;
+      }
+
+      const cart = await cartRes.json();
+
+      if (!cart || cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+
+      // ✅ CALCULATE TOTAL
+      const totalAmount = cart.reduce((sum, item) => {
+        return sum + item.price * item.quantity;
+      }, 0);
+
+      // ✅ CREATE ORDER
+      const orderRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: user.email,
+            items: cart,
+            totalAmount
+          })
+        }
+      );
+
+      const orderData = await orderRes.json();
+
+      if (!orderData.success) {
+        alert("Order creation failed");
+        return;
+      }
+
+      const orderId = orderData.order._id;
+
+      // ✅ CREATE STRIPE SESSION
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ orderId, totalAmount })
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.url) {
+        alert("Payment failed");
+        console.log("Stripe error:", data);
+        return;
+      }
+
+      // ✅ REDIRECT TO STRIPE
+      window.location.href = data.url;
+
+    } catch (err) {
+      console.log("❌ Payment error:", err);
+      alert("Something went wrong");
     }
-
-    // ✅ Get cart
-    const cartRes = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/${user.email}`);
-    const cart = await cartRes.json();
-
-    if (!cart || cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-
-    const totalAmount = cart.reduce((sum, item) => {
-      return sum + item.price * item.quantity;
-    }, 0);
-
-    // ✅ Create order
-    const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: user.email,
-        items: cart,
-        totalAmount
-      })
-    });
-
-    const orderData = await orderRes.json();
-
-    if (!orderData.success) {
-      alert("Order creation failed");
-      return;
-    }
-
-    const orderId = orderData.order._id;
-
-    // ✅ Stripe session
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ orderId, totalAmount })
-    });
-
-    const data = await res.json();
-
-    if (!data.url) {
-      alert("Payment failed");
-      console.log(data);
-      return;
-    }
-
-    window.location.href = data.url;
-
-  } catch (err) {
-    console.log("❌ Payment error:", err);
-    alert("Something went wrong");
-  }
-};
+  };
 
   return (
     <div className="payment-page">
@@ -102,9 +121,9 @@ function Payment() {
       {/* Address */}
       <div className="address-card">
         <div>
-          <p className="deliver-to">Deliver to Sowmya, 574211</p>
+          <p className="deliver-to">Deliver to {address.name || "User"}, {address.pincode || "000000"}</p>
           <p className="address-text">
-            {address.address || "Kudkunja House Sarapady Post And Village"}
+            {address.address || "No address provided"}
           </p>
         </div>
         <button className="change-btn">CHANGE</button>
@@ -135,7 +154,10 @@ function Payment() {
         <span><FaCreditCard className="icon" /> EMI</span>
       </div>
 
-      <div className="payment-box" onClick={() => alert("COD Selected")}>
+      <div
+        className="payment-box"
+        onClick={() => alert("Cash on Delivery Selected")}
+      >
         <span><FaMoneyBillWave className="icon" /> Cash on Delivery</span>
       </div>
 
