@@ -1,12 +1,74 @@
-.payment-box {
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  background: white;
+/* Page background */
+body {
+  background-color: #f1f3f6;
+  font-family: Arial, sans-serif;
 }
 
+/* Title */
+h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Container spacing */
+div {
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Payment box (main cards) */
+.payment-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e0e0e0;
+  padding: 15px 18px;
+  margin: 12px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
 .payment-box:hover {
-  background: #f5f5f5;
+  background: #f9fafb;
+  transform: scale(1.01);
+}
+
+/* Add arrow on right side */
+.payment-box::after {
+  content: "›";
+  font-size: 18px;
+  color: #888;
+}
+
+/* Add spacing between text and icon look */
+.payment-box span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Optional: highlight clickable ones */
+.payment-box:active {
+  transform: scale(0.98);
+}
+
+/* Footer icons section (like screenshot bottom row) */
+.payment-footer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 30px;
+  text-align: center;
+  color: #555;
+  font-size: 12px;
+}
+
+/* Footer items */
+.payment-footer div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
