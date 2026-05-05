@@ -23,8 +23,8 @@ function generateInvoice(order) {
       .fillColor("black")
       .fontSize(10)
       .font("Helvetica")
-      .text("Kochi, India", 400, 40, { align: "right" })
-      .text("support@firstcryclone.com", 400, 55, { align: "right" });
+      .text("Kochi, India", 400, 40, { align: "right", width: 150 })
+      .text("support@firstcryclone.com", 400, 55, { align: "right", width: 150 });
 
     // 🔲 LINE
     doc.moveTo(40, 80).lineTo(550, 80).stroke();
@@ -49,13 +49,13 @@ function generateInvoice(order) {
     doc.text("Customer:", 40, 190);
     doc.text(order.email, 140, 190);
 
-    // 🌍 RIGHT SIDE
+    // 🌍 RIGHT SIDE COUNTRY
     doc.text("India", 450, 170);
 
     // 💰 AMOUNT
-    doc.text(`Amount: ₹${order.totalAmount.toFixed(2)}`, 40, 220);
+    doc.text(`Amount: \u20B9${order.totalAmount.toFixed(2)}`, 40, 220);
 
-    // 🔳 TABLE HEADER (GREY)
+    // 🔳 TABLE HEADER
     doc
       .rect(40, 250, 510, 25)
       .fillAndStroke("#eeeeee", "black");
@@ -79,9 +79,9 @@ function generateInvoice(order) {
 
       doc.text(index + 1, 45, y);
       doc.text(item.name || "-", 100, y);
-      doc.text(`₹${price}`, 300, y);
+      doc.text(`\u20B9${price}`, 300, y);
       doc.text(qty, 390, y);
-      doc.text(`₹${total}`, 450, y);
+      doc.text(`\u20B9${total}`, 450, y);
 
       y += 25;
     });
@@ -91,20 +91,21 @@ function generateInvoice(order) {
 
     const subtotal = order.totalAmount;
     const gst = subtotal * 0.18;
-    const total = subtotal + gst;
+    const finalTotal = subtotal + gst;
 
     // 💰 TOTALS (RIGHT SIDE)
     doc.font("Helvetica");
 
-    doc.text(`Subtotal: ₹${subtotal}`, 350, y + 20);
-    doc.text(`GST (18%): ₹${gst.toFixed(2)}`, 350, y + 40);
+    doc.text(`Subtotal: \u20B9${subtotal}`, 350, y + 20);
+    doc.text(`GST (18%): \u20B9${gst.toFixed(2)}`, 350, y + 40);
 
     doc
       .font("Helvetica-Bold")
       .fontSize(13)
-      .text(`Total Amount ₹${total.toFixed(2)}`, 350, y + 70);
-
-   
+      .text(`Total Amount \u20B9${finalTotal.toFixed(2)}`, 300, y + 70, {
+        align: "right",
+        width: 250
+      });
 
     doc.end();
   });
