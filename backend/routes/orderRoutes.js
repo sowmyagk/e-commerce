@@ -3,16 +3,12 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
-// ✅ ADD THESE 2 LINES
-const generateInvoice = require("../utils/generateInvoice");
-const sendEmail = require("../utils/sendEmail");
-
-
 // ✅ PLACE ORDER
 router.post("/", async (req, res) => {
   try {
     const { email, items, totalAmount } = req.body;
 
+    // 🔒 VALIDATIONS
     if (!email) {
       return res.status(400).json({ message: "User email required" });
     }
@@ -26,7 +22,7 @@ router.post("/", async (req, res) => {
     }
 
     const newOrder = new Order({
-      email,
+      email,          // ✅ FIXED
       items,
       totalAmount
     });
@@ -34,25 +30,7 @@ router.post("/", async (req, res) => {
     await newOrder.save();
 
     // ✅ CLEAR CART
-    await Cart.deleteMany({ email });
-
-    // 🔥🔥🔥 IMPORTANT PART STARTS HERE
-
-    try {
-      const pdfBuffer = await generateInvoice(newOrder);
-
-      await sendEmail(
-        email,
-        null,        // no OTP
-        pdfBuffer    // 🔥 send invoice
-      );
-
-      console.log("✅ Invoice email sent");
-    } catch (err) {
-      console.log("❌ Invoice email failed:", err.message);
-    }
-
-    // 🔥🔥🔥 IMPORTANT PART ENDS HERE
+    await Cart.deleteMany({ email });  // ✅ FIXED
 
     res.status(201).json({
       success: true,
@@ -63,6 +41,38 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error("Order error:", err);
     res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+
+// ✅ GET ORDERS BY USER
+router.get("/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    if (!email) {
+      return res.status(400).json({ message: "User email required" });
+    }
+
+    const orders = await Order.find({ email }).sort({ createdAt: -1 });
+
+    res.json(orders);
+
+  } catch (err) {
+    console.error("Fetch orders error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+// ✅ GET ALL ORDERS
+router.get("/", async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.error("Fetch all orders error:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

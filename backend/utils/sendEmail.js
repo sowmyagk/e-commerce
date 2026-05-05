@@ -31,4 +31,4 @@ async function sendEmail(to, otp, pdfBuffer = null) {
   }
 }
 
-module.exports = sendEmail;
+module.exports = sendEmail;  
