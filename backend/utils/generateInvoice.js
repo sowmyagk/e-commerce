@@ -6,109 +6,76 @@ function generateInvoice(order) {
 
     let buffers = [];
     doc.on("data", buffers.push.bind(buffers));
-    doc.on("end", () => {
-      resolve(Buffer.concat(buffers));
-    });
+    doc.on("end", () => resolve(Buffer.concat(buffers)));
 
-    // ===============================
-    // 🟥 HEADER (LIKE NETFLIX STYLE)
-    // ===============================
+    // 🔴 BRAND NAME (TOP LEFT)
     doc
+      .fillColor("red")
       .fontSize(20)
-      .fillColor("#e50914")
-      .text("FirstCry Clone", { align: "left" });
+      .text("FirstCry Clone", 40, 40);
 
+    // 📍 RIGHT SIDE INFO
     doc
+      .fillColor("black")
       .fontSize(10)
-      .fillColor("black")
-      .text("Kochi, India", { align: "right" })
-      .text("support@firstcryclone.com", { align: "right" });
+      .text("Kochi, India", 400, 40, { align: "right" })
+      .text("support@firstcryclone.com", 400, 55, { align: "right" });
 
-    doc.moveDown();
+    // 🔲 LINE
+    doc.moveTo(40, 80).lineTo(550, 80).stroke();
 
-    // ===============================
     // 🧾 TITLE
-    // ===============================
-    doc
-      .fontSize(18)
-      .fillColor("black")
-      .text("Payment Receipt", { align: "left" });
+    doc.fontSize(18).text("Payment Receipt", 40, 100);
 
-    doc.moveDown();
+    doc.moveTo(40, 125).lineTo(550, 125).stroke();
 
-    // ===============================
     // 📄 ORDER DETAILS
-    // ===============================
     doc.fontSize(12);
+    doc.text(`Invoice ID: ${order._id}`, 40, 140);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 40, 160);
+    doc.text(`Customer: ${order.email}`, 40, 180);
 
-    doc.text(`Invoice ID: ${order._id}`);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`);
-    doc.text(`Customer: ${order.email}`);
-
-    doc.moveDown();
-
-    // ===============================
     // 🛒 TABLE HEADER
-    // ===============================
-    const tableTop = doc.y;
+    const tableTop = 220;
 
-    doc
-      .fontSize(12)
-      .text("Item", 50, tableTop)
-      .text("Description", 120, tableTop)
-      .text("Unit Cost", 300, tableTop)
-      .text("Qty", 380, tableTop)
-      .text("Line Total", 430, tableTop);
+    doc.fontSize(12).text("Item", 40, tableTop);
+    doc.text("Description", 100, tableTop);
+    doc.text("Unit Cost", 300, tableTop);
+    doc.text("Qty", 380, tableTop);
+    doc.text("Line Total", 440, tableTop);
 
-    doc.moveDown();
+    doc.moveTo(40, tableTop + 15).lineTo(550, tableTop + 15).stroke();
 
-    // ===============================
-    // 🛍️ PRODUCTS LIST
-    // ===============================
-    let y = doc.y;
+    // 🛒 PRODUCTS
+    let y = tableTop + 30;
 
-    order.items.forEach((item, i) => {
-      const lineTotal = item.price * item.quantity;
+    order.items.forEach((item, index) => {
+      const qty = item.quantity || item.qty || 1;
+      const price = item.price || 0;
+      const total = price * qty;
 
-      doc
-        .fontSize(11)
-        .text(i + 1, 50, y)
-        .text(item.name || "Product", 120, y)
-        .text(`₹${item.price}`, 300, y)
-        .text(item.quantity, 380, y)
-        .text(`₹${lineTotal}`, 430, y);
+      doc.text(index + 1, 40, y);
+      doc.text(item.name, 100, y);
+      doc.text(`₹${price}`, 300, y);
+      doc.text(qty, 380, y);
+      doc.text(`₹${total}`, 440, y);
 
-      y += 20;
+      y += 25;
     });
 
-    doc.moveDown();
-
-    // ===============================
-    // 💰 TOTALS
-    // ===============================
+    // 🔢 TOTAL SECTION (RIGHT SIDE)
     const subtotal = order.totalAmount;
     const gst = subtotal * 0.18;
     const total = subtotal + gst;
 
-    doc.moveDown();
-
-    doc.text(`Subtotal: ₹${subtotal}`, { align: "right" });
-    doc.text(`GST (18%): ₹${gst.toFixed(2)}`, { align: "right" });
+    doc.text(`Subtotal: ₹${subtotal}`, 350, y + 20);
+    doc.text(`GST (18%): ₹${gst.toFixed(2)}`, 350, y + 40);
 
     doc
-      .fontSize(14)
-      .text(`Total Amount: ₹${total.toFixed(2)}`, {
-        align: "right",
-      });
+      .font("Helvetica-Bold")
+      .text(`Total Amount ₹${total.toFixed(2)}`, 350, y + 70);
 
-    doc.moveDown();
-
-    // ===============================
-    // 🙏 FOOTER
-    // ===============================
-    doc
-      .fontSize(12)
-      .text("Thank you for shopping with us!", { align: "center" });
+    // ❌ REMOVED THANK YOU LINE (as you asked)
 
     doc.end();
   });
