@@ -12,7 +12,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const stripeRoutes = require("./routes/stripe");
 
-// UTILS (✅ FIXED IMPORT)
+// UTILS
 const { sendOTPEmail, sendInvoiceEmail } = require("./utils/sendEmail");
 const generateInvoice = require("./utils/generateInvoice");
 
@@ -31,8 +31,17 @@ cloudinary.config({
 });
 
 
-// 🔧 MIDDLEWARE (⚠️ ORDER IMPORTANT)
-app.use("/api/payment/webhook", express.raw({ type: "application/json" }));
+// ============================================
+// 🔥 IMPORTANT MIDDLEWARE ORDER (FIXED)
+// ============================================
+
+// ✅ Stripe webhook needs RAW body (ONLY for this route)
+app.use(
+  "/api/payment/webhook",
+  express.raw({ type: "application/json" })
+);
+
+// ✅ Normal middleware
 app.use(express.json());
 app.use(cors());
 
@@ -76,7 +85,6 @@ app.post("/api/otp/send", async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    // Prevent multiple OTP spam
     if (otpStore[email] && otpStore[email].expires > Date.now()) {
       console.log("⚠️ Using existing OTP:", otpStore[email].otp);
       return res.json({
@@ -85,7 +93,6 @@ app.post("/api/otp/send", async (req, res) => {
       });
     }
 
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     otpStore[email] = {
@@ -95,7 +102,6 @@ app.post("/api/otp/send", async (req, res) => {
 
     console.log("🔢 OTP:", otp, "EMAIL:", email);
 
-    // ✅ SEND EMAIL (FIXED)
     const emailRes = await sendOTPEmail(email, otp);
 
     if (emailRes?.error) {
@@ -108,7 +114,7 @@ app.post("/api/otp/send", async (req, res) => {
     return res.json({
       success: true,
       isNewUser: !user,
-      otp // ⚠️ remove in production
+      otp // remove in production
     });
 
   } catch (err) {
@@ -159,7 +165,7 @@ app.post("/api/otp/verify", async (req, res) => {
 
 
 // =========================
-// 📩 SEND INVOICE (MANUAL - COD)
+// 📩 SEND INVOICE (COD)
 // =========================
 app.post("/api/send-invoice/:id", async (req, res) => {
   try {
@@ -175,10 +181,8 @@ app.post("/api/send-invoice/:id", async (req, res) => {
 
     console.log("📧 Sending invoice to:", order.email);
 
-    // Generate PDF
     const pdfBuffer = await generateInvoice(order);
 
-    // ✅ SEND EMAIL (FIXED)
     const emailRes = await sendInvoiceEmail(order.email, pdfBuffer);
 
     if (emailRes?.error) {
