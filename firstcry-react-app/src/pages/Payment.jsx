@@ -55,12 +55,18 @@ function Payment() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ orderId })
+      body: JSON.stringify({ orderId, totalAmount })
     });
 
     const data = await res.json();
 
-    window.location.href = data.url;
+if (!data.url) {
+  alert("Payment failed");
+  console.log("Stripe error:", data);
+  return;
+}
+
+window.location.href = data.url;
   };
 
   return (
