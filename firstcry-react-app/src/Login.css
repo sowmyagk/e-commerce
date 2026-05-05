@@ -171,6 +171,6 @@ body {
   cursor: pointer;
   border-radius: 4px;
 
-  width: auto;        /* ✅ IMPORTANT FIX */
-  display: inline-block; /* ✅ prevents full width */
+  width: auto;     
+  display: inline-block; 
 }
