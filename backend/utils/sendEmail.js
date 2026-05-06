@@ -20,6 +20,7 @@ async function sendOTPEmail(to, otp) {
   }
 }
 
+
 async function sendInvoiceEmail(to, pdfBuffer) {
   try {
     const response = await resend.emails.send({
