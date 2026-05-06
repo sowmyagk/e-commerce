@@ -1,22 +1,20 @@
-/* MAIN LAYOUT */
-.dashboard {
+.admin-layout {
   display: flex;
-  height: 100vh;
-  background: #f4f6f9;
-  font-family: Arial, sans-serif;
+  background: #f5f6fa;
 }
 
-/* SIDEBAR */
+/* 🔥 SIDEBAR */
 .sidebar {
   width: 220px;
-  background: #2f3b52;
+  height: 100vh;
+  background: #2f3542;
   color: white;
   padding: 20px;
 }
 
-.logo {
-  margin-bottom: 30px;
-  color: #9be15d;
+.sidebar h2 {
+  color: #7bed9f;
+  margin-bottom: 20px;
 }
 
 .sidebar ul {
@@ -24,72 +22,51 @@
   padding: 0;
 }
 
-.sidebar ul li {
+.sidebar li {
   margin: 15px 0;
+  cursor: pointer;
 }
 
-.sidebar ul li a {
-  text-decoration: none;
-  color: #ddd;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.sidebar ul li a:hover {
-  color: #fff;
-}
-
-/* MAIN */
-.main {
+/* 🔥 MAIN CONTENT */
+.main-content {
   flex: 1;
   padding: 20px;
 }
 
-/* TOPBAR */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+.subtitle {
+  color: gray;
+  margin-bottom: 20px;
 }
 
-.logout-btn {
-  background: #ff4d4d;
-  border: none;
-  padding: 8px 16px;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* QUICK CARDS */
-.quick-cards {
+/* 🔹 CARDS */
+.card-container {
   display: flex;
   gap: 20px;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
-.quick-card {
+.card {
   flex: 1;
   background: white;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-  }
+/* 🔹 CHARTS */
+.charts-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
 
-  .sidebar {
-    width: 100%;
-  }
+.chart-box {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
 
-  .quick-cards {
-    flex-direction: column;
-  }
+.chart-box.full {
+  width: 100%;
 }
