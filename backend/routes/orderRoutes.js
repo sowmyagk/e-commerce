@@ -24,7 +24,9 @@ router.post("/", async (req, res) => {
     const newOrder = new Order({
       email,        
       items,
-      totalAmount
+      totalAmount,
+
+      status: "Pending"
     });
 
     await newOrder.save();
@@ -44,6 +46,18 @@ router.post("/", async (req, res) => {
   }
 });
 
+
+router.put("/update-status/:id", async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    await Order.findByIdAndUpdate(req.params.id, { status });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 router.get("/:email", async (req, res) => {
   try {

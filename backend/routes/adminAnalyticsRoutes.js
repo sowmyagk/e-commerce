@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
+
 const Order = require("../models/Order");
 const User = require("../models/User");
 
-// Sales (group by date/month/year)
+/* =========================
+   📊 SALES (Monthly)
+========================= */
 router.get("/sales", async (req, res) => {
   try {
     const sales = await Order.aggregate([
@@ -13,38 +16,78 @@ router.get("/sales", async (req, res) => {
           totalSales: { $sum: "$totalAmount" },
           orders: { $sum: 1 }
         }
-      }
+      },
+      { $sort: { _id: 1 } }
     ]);
 
     res.json(sales);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Total orders
+/* =========================
+   📦 TOTAL ORDERS COUNT
+========================= */
 router.get("/orders-count", async (req, res) => {
-  const count = await Order.countDocuments();
-  res.json({ count });
+  try {
+    const count = await Order.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Signup count
+/* =========================
+   👤 TOTAL USERS COUNT
+========================= */
 router.get("/users-count", async (req, res) => {
-  const count = await User.countDocuments();
-  res.json({ count });
+  try {
+    const count = await User.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Payments received
+/* =========================
+   💰 TOTAL PAYMENTS
+========================= */
 router.get("/payments", async (req, res) => {
-  const payments = await Order.aggregate([
-    {
-      $group: {
-        _id: null,
-        total: { $sum: "$totalAmount" }
+  try {
+    const result = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalAmount" }
+        }
       }
-    }
-  ]);
-  res.json(payments[0]);
+    ]);
+
+    res.json({ total: result[0]?.total || 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* =========================
+   🚚 ORDER STATUS (Pie Chart)
+========================= */
+router.get("/order-status", async (req, res) => {
+  try {
+    const data = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
