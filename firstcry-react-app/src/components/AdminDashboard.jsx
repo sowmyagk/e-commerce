@@ -16,9 +16,9 @@ function AdminDashboard() {
         <div className="admin-card">
           <h3>Add Product</h3>
           <p>Create new product</p>
-          <Link to="/addproduct" className="admin-btn">
+         <p><Link to="/addproduct" className="admin-btn">
             Add
-          </Link>
+          </Link></p>
         </div>
 
         <div className="admin-card">
