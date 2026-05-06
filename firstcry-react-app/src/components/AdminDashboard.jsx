@@ -1,5 +1,7 @@
 import React from "react";
 import "./AdminDashboard.css";
+import { useNavigate } from "react-router-dom";
+
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar,
@@ -11,7 +13,9 @@ import {
 const COLORS = ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0"];
 
 function AdminDashboard() {
+  const navigate = useNavigate();
 
+  // 🔹 Dummy Data (replace later with backend)
   const stats = {
     totalOrders: 32,
     totalRevenue: 12732,
@@ -45,12 +49,13 @@ function AdminDashboard() {
       {/* 🔥 SIDEBAR */}
       <div className="sidebar">
         <h2>Admin Panel</h2>
+
         <ul>
-          <li>Dashboard</li>
-          <li>Orders</li>
-          <li>Products</li>
-          <li>Add Product</li>
-          <li>Users</li>
+          <li onClick={() => navigate("/admindashboard")}>Dashboard</li>
+          <li onClick={() => navigate("/orders")}>Orders</li>
+          <li onClick={() => navigate("/products")}>Products</li>
+          <li onClick={() => navigate("/add-product")}>Add Product</li>
+          <li onClick={() => navigate("/users")}>Users</li>
         </ul>
       </div>
 
@@ -62,15 +67,31 @@ function AdminDashboard() {
 
         {/* 🔹 CARDS */}
         <div className="card-container">
-          <div className="card"><h4>Total Orders</h4><p>{stats.totalOrders}</p></div>
-          <div className="card"><h4>Total Revenue</h4><p>₹{stats.totalRevenue}</p></div>
-          <div className="card"><h4>Registered Users</h4><p>{stats.users}</p></div>
-          <div className="card"><h4>Payments Received</h4><p>{stats.payments}</p></div>
+          <div className="card">
+            <h4>Total Orders</h4>
+            <p>{stats.totalOrders}</p>
+          </div>
+
+          <div className="card">
+            <h4>Total Revenue</h4>
+            <p>₹{stats.totalRevenue}</p>
+          </div>
+
+          <div className="card">
+            <h4>Registered Users</h4>
+            <p>{stats.users}</p>
+          </div>
+
+          <div className="card">
+            <h4>Payments Received</h4>
+            <p>{stats.payments}</p>
+          </div>
         </div>
 
-        {/* 🔹 CHARTS */}
+        {/* 🔹 CHARTS ROW 1 */}
         <div className="charts-row">
 
+          {/* PIE */}
           <div className="chart-box">
             <h3>Orders by Status</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -86,6 +107,7 @@ function AdminDashboard() {
             </ResponsiveContainer>
           </div>
 
+          {/* BAR */}
           <div className="chart-box">
             <h3>Monthly Orders</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -101,7 +123,10 @@ function AdminDashboard() {
 
         </div>
 
+        {/* 🔹 CHARTS ROW 2 */}
         <div className="charts-row">
+
+          {/* LINE */}
           <div className="chart-box full">
             <h3>Sales Trend</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -114,6 +139,7 @@ function AdminDashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+
         </div>
 
       </div>
