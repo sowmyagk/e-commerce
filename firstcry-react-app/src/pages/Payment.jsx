@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { SiGooglepay } from "react-icons/si";
 
-const stripePromise = loadStripe("pk_test_51TJoSzRcOSTL52HSy6AzzMebz2hoVUyTzJ1ndvxNzNeC1jln9TThGF58lZiy10Se6pL7qp8QmZSrbs5GBvIx8mqZ00Cc7BZ1pW");
+const stripePromise = loadStripe("pk_test_51TTke613sIQUPKxmpZppXZhU8mh0c2LiR0pNweRdWkHfH6TjfQp42UsEP7vEC0KwBN5SlEwq8w0XvKqNbRVCxvsp00CsIqGdff");
 
 function Payment() {
   const location = useLocation();
