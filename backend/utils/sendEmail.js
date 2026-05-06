@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 async function sendOTPEmail(to, otp) {
   try {
     const response = await resend.emails.send({
-      from: "My App <onboarding@resend.dev>", // change later
+      from: "My App <onboarding@resend.dev>", 
       to: to,
       subject: "OTP Verification",
       html: `<h2>Your OTP is: ${otp}</h2>`,

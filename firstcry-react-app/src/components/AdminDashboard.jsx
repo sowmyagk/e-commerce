@@ -1,45 +1,45 @@
-import { Link } from "react-router-dom";
 import "./AdminDashboard.css";
+import Charts from "./Charts";
+import { Link } from "react-router-dom";
 
 function AdminDashboard() {
   return (
-    <div className="admin-wrapper">
+    <div className="dashboard">
 
-      
-      <div className="admin-header">
-        <h2>FirstCry Admin</h2>
+      {/* SIDEBAR */}
+      <div className="sidebar">
+        <h2 className="logo">Admin Panel</h2>
+
+        <ul>
+          <li><Link to="/admin">Dashboard</Link></li>
+          <li><Link to="/orders">Orders</Link></li>
+          <li><Link to="/viewproduct">Products</Link></li>
+          <li><Link to="/addproduct">Add Product</Link></li>
+          <li><Link to="/users">Users</Link></li>
+        </ul>
       </div>
 
-      
-      <div className="admin-content">
+      {/* MAIN CONTENT */}
+      <div className="main">
 
-        <div className="admin-card">
-          <h3>Add Product</h3>
-          <p>Create new product</p>
-         <p><Link to="/addproduct" className="admin-btn">
-            Add
-          </Link></p>
+        {/* TOP BAR */}
+        <div className="topbar">
+          <h2>Welcome, Admin!</h2>
+          <button className="logout-btn">Logout</button>
         </div>
 
-        <div className="admin-card">
-          <h3>View Products</h3>
-          <p>See all products</p>
-          <Link to="/viewproduct" className="admin-btn">
-            View
-          </Link>
+        {/* QUICK CARDS */}
+        <div className="quick-cards">
+          <div className="quick-card">Orders</div>
+          <div className="quick-card">Products</div>
+          <div className="quick-card">Add Product</div>
+          <div className="quick-card">Users</div>
         </div>
 
-        <div className="admin-card">
-          <h3>Remove Products</h3>
-          <p>See all Products</p>
-          <Link to="/removeproduct" className="admin-btn">
-          Remove
-          </Link>
-        </div>
-
+        {/* ANALYTICS */}
+        <Charts />
 
       </div>
-
     </div>
   );
 }

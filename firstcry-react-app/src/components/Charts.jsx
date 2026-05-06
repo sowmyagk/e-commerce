@@ -1,7 +1,7 @@
-
-
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "./Charts.css";
+
 import {
   PieChart,
   Pie,
@@ -19,157 +19,104 @@ import {
 } from "recharts";
 
 function Charts() {
-  const [planData, setPlanData] = useState([]);
-  const [priceData, setPriceData] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
+  const [salesData, setSalesData] = useState([]);
+  const [orders, setOrders] = useState(0);
+  const [users, setUsers] = useState(0);
+  const [payments, setPayments] = useState(0);
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/plans`
-        );
-
-        let basic = 0;
-        let standard = 0;
-        let premium = 0;
-
-        const prices = {
-          basic: 199,
-          standard: 499,
-          premium: 649,
-        };
-
-        res.data.forEach((item) => {
-          const plan = item.plan.toLowerCase();
-
-          if (plan === "basic") basic++;
-          else if (plan === "standard") standard++;
-          else if (plan === "premium") premium++;
-        });
-
-       
-        setPlanData([
-          { name: "Basic", value: basic },
-          { name: "Standard", value: standard },
-          { name: "Premium", value: premium },
-        ]);
-
-        setPriceData([
-  {
-    name: "Basic",
-    price: basic > 0 ? prices.basic : 199,
-    subscribers: basic,
-  },
-  {
-    name: "Standard",
-    price: standard > 0 ? prices.standard : 499,
-    subscribers: standard,
-  },
-  {
-    name: "Premium",
-    price: premium > 0 ? prices.premium : 799, 
-    subscribers: premium,
-  },
-]);
-
-       
-        setRevenueData([
-          {
-            name: "Basic",
-            revenue: basic * prices.basic,
-          },
-          {
-            name: "Standard",
-            revenue: standard * prices.standard,
-          },
-          {
-            name: "Premium",
-            revenue: premium * prices.premium,
-          },
-        ]);
-      } catch (error) {
-        console.error("Error fetching plans", error);
-      }
-    };
-
-    fetchPlans();
+    fetchData();
   }, []);
 
-  const COLORS = ["#E50914", "#0071EB", "#FFA500"];
+  const fetchData = async () => {
+    try {
+      const salesRes = await axios.get("http://localhost:5000/api/admin/sales");
+      const ordersRes = await axios.get("http://localhost:5000/api/admin/orders-count");
+      const usersRes = await axios.get("http://localhost:5000/api/admin/users-count");
+      const paymentsRes = await axios.get("http://localhost:5000/api/admin/payments");
+
+      const formattedSales = salesRes.data.map((item) => ({
+        month: `M${item._id}`, // Month number
+        sales: item.totalSales,
+        orders: item.orders,
+      }));
+
+      setSalesData(formattedSales);
+      setOrders(ordersRes.data.count);
+      setUsers(usersRes.data.count);
+      setPayments(paymentsRes.data.total || 0);
+
+    } catch (err) {
+      console.error("Error fetching analytics:", err);
+    }
+  };
+
+  const COLORS = ["#0088FE", "#FF8042", "#00C49F"];
 
   return (
-    <div className="dashboard-charts">
-      
-      <div className="chart-box">
-        <h2 className="head">Plan Distribution</h2>
-        <ResponsiveContainer width="100%" height="90%">
-          <PieChart>
-            <Pie
-              data={planData}
-              dataKey="value"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label={({ percent }) =>
-                `${(percent * 100).toFixed(0)}%`
-              }
-            >
-              {planData.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+    <div className="charts-container">
+
+      {/* SUMMARY */}
+      <div className="summary-cards">
+        <div className="summary-card">Orders: {orders}</div>
+        <div className="summary-card">Users: {users}</div>
+        <div className="summary-card">Payments: ₹{payments}</div>
       </div>
 
-      <div className="chart-box">
-        <h2 className="head">Plan Price vs Subscribers</h2>
-        <ResponsiveContainer width="100%" height="90%">
-          <BarChart data={priceData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar
-              dataKey="price"
-              fill="#0071EB"
-              name="Price (₹)"
-            />
-            <Bar
-              dataKey="subscribers"
-              fill="#00C853"
-              name="Subscribers"
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* CHARTS */}
+      <div className="charts-grid">
 
-    
-      <div className="chart-box">
-        <h2 className="head">Revenue Generated by Plans</h2>
-        <ResponsiveContainer width="100%" height="90%">
-          <LineChart data={revenueData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="revenue"
-              stroke="#E50914"
-              strokeWidth={3}
-              name="Revenue (₹)"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {/* BAR CHART */}
+        <div className="chart-box">
+          <h3>Monthly Sales</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={salesData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="sales" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* LINE CHART */}
+        <div className="chart-box">
+          <h3>Orders Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={salesData}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="orders" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* PIE CHART */}
+        <div className="chart-box">
+          <h3>Users vs Orders</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: "Users", value: users },
+                  { name: "Orders", value: orders },
+                ]}
+                dataKey="value"
+                outerRadius={100}
+              >
+                {COLORS.map((color, index) => (
+                  <Cell key={index} fill={color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
       </div>
     </div>
   );

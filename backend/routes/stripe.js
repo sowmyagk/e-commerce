@@ -3,11 +3,9 @@ const router = express.Router();
 const Stripe = require("stripe");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const generateInvoice = require("../utils/generateInvoice");
 const { sendInvoiceEmail } = require("../utils/sendEmail");
 const Order = require("../models/Order");
-
 
 router.post("/create-checkout-session", async (req, res) => {
   try {
@@ -16,12 +14,10 @@ router.post("/create-checkout-session", async (req, res) => {
     if (!orderId || !totalAmount) {
       return res.status(400).json({ error: "Order ID & amount required" });
     }
-  
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -43,7 +39,6 @@ router.post("/create-checkout-session", async (req, res) => {
       metadata: {
         orderId: orderId,
       },
-
       success_url: `${process.env.CLIENT_URL}/success`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });

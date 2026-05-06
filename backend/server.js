@@ -10,13 +10,14 @@ const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const stripeRoutes = require("./routes/stripe");
-
+const adminAnalyticsRoutes = require("./routes/adminAnalyticsRoutes");
 const { sendOTPEmail, sendInvoiceEmail } = require("./utils/sendEmail");
 const generateInvoice = require("./utils/generateInvoice");
 
 const User = require("./models/User");
 const Order = require("./models/Order");
 const app = express();
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -32,7 +33,7 @@ app.use(
 
 app.use(express.json());
 app.use(cors());
-
+app.use("/api/admin", adminAnalyticsRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log(" MongoDB connected"))
