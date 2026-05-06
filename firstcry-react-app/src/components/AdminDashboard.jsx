@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "./components/Sidebar";
 function AdminDashboard() {
 
   const navigate = useNavigate();
@@ -17,4 +17,4 @@ function AdminDashboard() {
   );
 }
 
-export default Dash;
+export default AdminDashboard;
