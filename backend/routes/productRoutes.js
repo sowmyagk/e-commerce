@@ -33,12 +33,11 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
       productdescription,
       image: req.file.path
     });
-
     await product.save();
 
     res.json({ success: true });
-
-  } catch (error) {
+  }
+   catch (error) {
     console.error(error);
     res.status(500).json({ success: false });
   }
@@ -67,8 +66,8 @@ router.put("/update-product/:id", async (req, res) => {
     });
 
     res.json({ success: true });
-
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ success: false });
   }
 });

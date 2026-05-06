@@ -3,7 +3,7 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
-// ✅ PLACE ORDER
+
 router.post("/", async (req, res) => {
   try {
     const { email, items, totalAmount } = req.body;
@@ -22,15 +22,15 @@ router.post("/", async (req, res) => {
     }
 
     const newOrder = new Order({
-      email,          // ✅ FIXED
+      email,        
       items,
       totalAmount
     });
 
     await newOrder.save();
 
-    // ✅ CLEAR CART
-    await Cart.deleteMany({ email });  // ✅ FIXED
+   
+    await Cart.deleteMany({ email });  
 
     res.status(201).json({
       success: true,
@@ -45,7 +45,6 @@ router.post("/", async (req, res) => {
 });
 
 
-// ✅ GET ORDERS BY USER
 router.get("/:email", async (req, res) => {
   try {
     const { email } = req.params;
@@ -64,8 +63,6 @@ router.get("/:email", async (req, res) => {
   }
 });
 
-
-// ✅ GET ALL ORDERS
 router.get("/", async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });

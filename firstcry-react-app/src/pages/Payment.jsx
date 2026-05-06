@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import "./Payment.css";
 
-// ✅ Icons
 import {
   FaCreditCard,
   FaUniversity,
@@ -19,14 +18,13 @@ const stripePromise = loadStripe("pk_test_51TJoSzRcOSTL52HSy6AzzMebz2hoVUyTzJ1nd
 function Payment() {
   const location = useLocation();
 
-  // ✅ SAFE ADDRESS HANDLING
+ 
   const address = location?.state?.address || {};
 
   const handlePayment = async () => {
     try {
       const stripe = await stripePromise;
 
-      // ✅ SAFE USER CHECK
       const user = JSON.parse(localStorage.getItem("user"));
 
       if (!user || !user.email) {
@@ -34,7 +32,6 @@ function Payment() {
         return;
       }
 
-      // ✅ FETCH CART
       const cartRes = await fetch(
         `${import.meta.env.VITE_API_URL}/api/cart/${user.email}`
       );
@@ -51,12 +48,10 @@ function Payment() {
         return;
       }
 
-      // ✅ CALCULATE TOTAL
       const totalAmount = cart.reduce((sum, item) => {
         return sum + item.price * item.quantity;
       }, 0);
 
-      // ✅ CREATE ORDER
       const orderRes = await fetch(
         `${import.meta.env.VITE_API_URL}/api/orders`,
         {
@@ -80,8 +75,6 @@ function Payment() {
       }
 
       const orderId = orderData.order._id;
-
-      // ✅ CREATE STRIPE SESSION
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
         {
@@ -101,11 +94,10 @@ function Payment() {
         return;
       }
 
-      // ✅ REDIRECT TO STRIPE
       window.location.href = data.url;
 
     } catch (err) {
-      console.log("❌ Payment error:", err);
+      console.log(" Payment error:", err);
       alert("Something went wrong");
     }
   };
@@ -113,12 +105,10 @@ function Payment() {
   return (
     <div className="payment-page">
 
-      {/* Header */}
       <div className="payment-header">
         ← Payment Method
       </div>
 
-      {/* Address */}
       <div className="address-card">
         <div>
           <p className="deliver-to">Deliver to {address.name || "User"}, {address.pincode || "000000"}</p>
@@ -129,7 +119,6 @@ function Payment() {
         <button className="change-btn">CHANGE</button>
       </div>
 
-      {/* Offer */}
       <div className="offer-card">
         <p className="offer-title">Flat ₹1500 Off</p>
         <p className="offer-desc">On Credit Cards | Above ₹15000</p>
@@ -137,7 +126,6 @@ function Payment() {
 
       <h2 className="payment-title">Payment Options</h2>
 
-      {/* Payment Options */}
       <div className="payment-box" onClick={handlePayment}>
         <span><FaCreditCard className="icon" /> Credit / Debit Card</span>
       </div>
@@ -161,7 +149,6 @@ function Payment() {
         <span><FaMoneyBillWave className="icon" /> Cash on Delivery</span>
       </div>
 
-      {/* Footer */}
       <div className="payment-footer">
         <div>
           <FaLock className="footer-icon" />

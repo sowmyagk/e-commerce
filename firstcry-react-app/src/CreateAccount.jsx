@@ -5,7 +5,6 @@ import axios from "axios";
 
 function CreateAccount() {
   const navigate = useNavigate();  
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -18,7 +17,6 @@ function CreateAccount() {
   `${import.meta.env.VITE_API_URL}/api/otp/send`,
   { email }
 );
-
       console.log(result.data);
       alert("OTP sent successfully");
       navigate("/OtpPage", {

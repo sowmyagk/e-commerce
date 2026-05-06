@@ -6,10 +6,6 @@ function Header() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
- 
-
-
-
  useEffect(() => {
   fetch(`${import.meta.env.VITE_API_URL}/api/products`)
     .then(res => {
@@ -21,7 +17,7 @@ function Header() {
     .then(data => setProducts(data))
     .catch(err => {
       console.log("API ERROR:", err);
-      setProducts([]); // prevent crash
+      setProducts([]);
     });
 }, []);
 

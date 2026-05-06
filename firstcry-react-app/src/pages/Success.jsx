@@ -5,7 +5,7 @@ function Success() {
   useEffect(() => {
 
     const params = new URLSearchParams(window.location.search);
-    const orderId = params.get("orderId"); // ✅ GET FROM URL
+    const orderId = params.get("orderId");
 
     if (orderId) {
       fetch(`${import.meta.env.VITE_API_URL}/api/send-invoice/${orderId}`, {

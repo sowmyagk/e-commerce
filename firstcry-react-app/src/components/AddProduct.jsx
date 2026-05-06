@@ -115,7 +115,7 @@ function AddProduct() {
 
           {id && existingImage && (
             <img
-              src={existingImage}   // FIXED HERE
+              src={existingImage}   
               width="120"
               style={{ marginBottom: "10px" }}
               alt="product"

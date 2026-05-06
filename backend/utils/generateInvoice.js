@@ -8,9 +8,6 @@ function generateInvoice(order) {
     doc.on("data", buffers.push.bind(buffers));
     doc.on("end", () => resolve(Buffer.concat(buffers)));
 
-    // =========================
-    // 🏢 COMPANY DETAILS
-    // =========================
     doc
       .fontSize(20)
       .font("Helvetica-Bold")
@@ -23,9 +20,7 @@ function generateInvoice(order) {
       .text("Email: support@firstcryclone.com", 40, 80)
       .text("GSTIN: 32ABCDE1234F1Z5", 40, 95);
 
-    // =========================
-    // 🧾 INVOICE TITLE
-    // =========================
+
     doc
       .fontSize(18)
       .font("Helvetica-Bold")
@@ -37,12 +32,9 @@ function generateInvoice(order) {
       .text(`Invoice No: INV-${order?._id?.toString().slice(-6) || "000000"}`, 400, 70)
       .text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 400, 85);
 
-    // LINE
     doc.moveTo(40, 120).lineTo(550, 120).stroke();
 
-    // =========================
-    // 👤 BILL TO
-    // =========================
+
     doc
       .fontSize(12)
       .font("Helvetica-Bold")
@@ -57,9 +49,6 @@ function generateInvoice(order) {
       doc.text(order.address, 40, 175);
     }
 
-    // =========================
-    // 📦 TABLE HEADER
-    // =========================
     const tableTop = 200;
 
     doc
@@ -74,9 +63,7 @@ function generateInvoice(order) {
     doc.text("Qty", 380, tableTop + 7, { width: 40, align: "right" });
     doc.text("Total (₹)", 450, tableTop + 7, { width: 80, align: "right" });
 
-    // =========================
-    // 🛒 ITEMS
-    // =========================
+ 
     let y = tableTop + 35;
     let subtotal = 0;
 
@@ -89,7 +76,6 @@ function generateInvoice(order) {
 
       subtotal += total;
 
-      // Auto page break
       if (y > 700) {
         doc.addPage();
         y = 50;
@@ -104,12 +90,8 @@ function generateInvoice(order) {
       y += 25;
     });
 
-    // LINE
     doc.moveTo(40, y).lineTo(550, y).stroke();
 
-    // =========================
-    // 💰 GST CALCULATION
-    // =========================
     const cgst = +(subtotal * 0.09).toFixed(2);
     const sgst = +(subtotal * 0.09).toFixed(2);
     const totalAmount = subtotal + cgst + sgst;
@@ -128,9 +110,6 @@ function generateInvoice(order) {
         width: 250,
       });
 
-    // =========================
-    // 📝 FOOTER
-    // =========================
     doc
       .fontSize(10)
       .font("Helvetica")
@@ -143,3 +122,23 @@ function generateInvoice(order) {
 }
 
 module.exports = generateInvoice;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

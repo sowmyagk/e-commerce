@@ -10,15 +10,11 @@ function Login() {
   const handleLogin = async () => {
   console.log("Button clicked"); 
 
-
 console.log("API URL:", import.meta.env.VITE_API_URL);
-
-
   if (!value) {
     alert("Please enter Email or Mobile");
     return;
   }
-
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/otp/send`, {
       method: "POST",
@@ -52,7 +48,6 @@ console.log("API URL:", import.meta.env.VITE_API_URL);
 };
   return (
     <div className="main-box">
-
  
   <button 
     className="admin-btn"
@@ -103,5 +98,4 @@ console.log("API URL:", import.meta.env.VITE_API_URL);
     </div>
   );
 }
-
 export default Login;
