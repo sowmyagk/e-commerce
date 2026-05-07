@@ -24,6 +24,8 @@ function AdminDashboard() {
 
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
@@ -33,10 +35,9 @@ function AdminDashboard() {
     outForDelivery: 0
   });
 
-
   useEffect(() => {
 
-    fetch("import.meta.env.VITE_API_URL/orders/dashboard/stats")
+    fetch(`${API_URL}/orders/dashboard/stats`)
       .then((res) => res.json())
       .then((data) => {
 
@@ -50,7 +51,6 @@ function AdminDashboard() {
       });
 
   }, []);
-
 
   const statusData = [
     {
@@ -79,7 +79,6 @@ function AdminDashboard() {
     { month: "May", orders: 25 },
   ];
 
-  
   const salesData = [
     { month: "Jan", revenue: 2000 },
     { month: "Feb", revenue: 5000 },
@@ -91,7 +90,6 @@ function AdminDashboard() {
   return (
     <div className="admin-layout">
 
-      
       <div className="sidebar">
 
         <h2>Admin Panel</h2>
@@ -116,16 +114,14 @@ function AdminDashboard() {
 
       </div>
 
-   
       <div className="main-content">
 
-        <h2>Welcome, Admin </h2>
+        <h2>Welcome, Admin</h2>
 
         <p className="subtitle">
           Here's your store analytics overview
         </p>
 
-   
         <div className="card-container">
 
           <div className="card">
@@ -150,7 +146,6 @@ function AdminDashboard() {
 
         </div>
 
-       
         <div className="charts-row">
 
           <div className="chart-box">
@@ -186,7 +181,6 @@ function AdminDashboard() {
 
           </div>
 
-    
           <div className="chart-box">
 
             <h3>Monthly Orders</h3>
@@ -216,7 +210,6 @@ function AdminDashboard() {
 
         </div>
 
-       
         <div className="charts-row">
 
           <div className="chart-box full">
