@@ -33,12 +33,10 @@ function AdminDashboard() {
     outForDelivery: 0
   });
 
-  // ============================================
-  // ✅ FETCH DASHBOARD DATA
-  // ============================================
+
   useEffect(() => {
 
-    fetch("http://localhost:5000/orders/dashboard/stats")
+    fetch("import.meta.env.VITE_API_URL/orders/dashboard/stats")
       .then((res) => res.json())
       .then((data) => {
 
@@ -53,9 +51,7 @@ function AdminDashboard() {
 
   }, []);
 
-  // ============================================
-  // ✅ PIE CHART DATA
-  // ============================================
+
   const statusData = [
     {
       name: "Delivered",
@@ -75,9 +71,6 @@ function AdminDashboard() {
     }
   ];
 
-  // ============================================
-  // ✅ DUMMY BAR GRAPH
-  // ============================================
   const monthlyOrders = [
     { month: "Jan", orders: 5 },
     { month: "Feb", orders: 10 },
@@ -86,9 +79,7 @@ function AdminDashboard() {
     { month: "May", orders: 25 },
   ];
 
-  // ============================================
-  // ✅ DUMMY SALES GRAPH
-  // ============================================
+  
   const salesData = [
     { month: "Jan", revenue: 2000 },
     { month: "Feb", revenue: 5000 },
@@ -100,9 +91,7 @@ function AdminDashboard() {
   return (
     <div className="admin-layout">
 
-      {/* ============================================
-          ✅ SIDEBAR
-      ============================================ */}
+      
       <div className="sidebar">
 
         <h2>Admin Panel</h2>
@@ -130,7 +119,7 @@ function AdminDashboard() {
    
       <div className="main-content">
 
-        <h2>Welcome, Admin 👋</h2>
+        <h2>Welcome, Admin </h2>
 
         <p className="subtitle">
           Here's your store analytics overview

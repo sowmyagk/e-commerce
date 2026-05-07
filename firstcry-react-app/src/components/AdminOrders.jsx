@@ -4,17 +4,16 @@ import "./AdminOrders.css";
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
 
-  // ✅ Backend URL
+
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // ✅ Fetch all orders
   const fetchOrders = async () => {
     try {
       const res = await fetch(`${API_URL}/orders`);
 
       const data = await res.json();
 
-      // ✅ Handle both array and object response
+      
       if (Array.isArray(data)) {
         setOrders(data);
       } else if (data.orders) {
@@ -32,7 +31,6 @@ function AdminOrders() {
     fetchOrders();
   }, []);
 
-  // ✅ Update order status
   const updateStatus = async (id, status) => {
     try {
       const res = await fetch(
@@ -75,7 +73,7 @@ function AdminOrders() {
               className="order-card"
               key={order._id}
             >
-              {/* ✅ Header */}
+    
               <div className="order-header">
                 <div>
                   <h3>{order.email}</h3>
@@ -98,7 +96,6 @@ function AdminOrders() {
                 </h2>
               </div>
 
-              {/* ✅ Products */}
               <div className="products-list">
                 {order.items &&
                   order.items.map((item, index) => (
@@ -131,7 +128,7 @@ function AdminOrders() {
                   ))}
               </div>
 
-              {/* ✅ Status */}
+          
               <div className="status-section">
                 <label>
                   Order Status:
