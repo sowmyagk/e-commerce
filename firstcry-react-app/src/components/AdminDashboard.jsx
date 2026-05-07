@@ -112,7 +112,7 @@ function AdminDashboard() {
             Dashboard
           </li>
 
-          <li onClick={() => navigate("/orders")}>
+          <li onClick={() => navigate("/adminorders")}>
             Orders
           </li>
 
@@ -127,9 +127,7 @@ function AdminDashboard() {
 
       </div>
 
-      {/* ============================================
-          ✅ MAIN CONTENT
-      ============================================ */}
+   
       <div className="main-content">
 
         <h2>Welcome, Admin 👋</h2>
@@ -138,9 +136,7 @@ function AdminDashboard() {
           Here's your store analytics overview
         </p>
 
-        {/* ============================================
-            ✅ CARDS
-        ============================================ */}
+   
         <div className="card-container">
 
           <div className="card">
@@ -165,12 +161,9 @@ function AdminDashboard() {
 
         </div>
 
-        {/* ============================================
-            ✅ CHART ROW 1
-        ============================================ */}
+       
         <div className="charts-row">
 
-          {/* ✅ PIE CHART */}
           <div className="chart-box">
 
             <h3>Orders by Status</h3>
@@ -204,7 +197,7 @@ function AdminDashboard() {
 
           </div>
 
-          {/* ✅ BAR GRAPH */}
+    
           <div className="chart-box">
 
             <h3>Monthly Orders</h3>
@@ -234,9 +227,7 @@ function AdminDashboard() {
 
         </div>
 
-        {/* ============================================
-            ✅ CHART ROW 2
-        ============================================ */}
+       
         <div className="charts-row">
 
           <div className="chart-box full">
