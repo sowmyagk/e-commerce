@@ -6,10 +6,6 @@ const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
 
-// ============================
-// PLACE ORDER
-// ============================
-
 router.post("/", async (req, res) => {
 
   try {
@@ -74,9 +70,6 @@ router.post("/", async (req, res) => {
 });
 
 
-// ============================
-// GET ALL ORDERS
-// ============================
 
 router.get("/", async (req, res) => {
 
@@ -99,11 +92,6 @@ router.get("/", async (req, res) => {
     });
   }
 });
-
-
-// ============================
-// DASHBOARD STATS
-// ============================
 
 router.get("/dashboard/stats", async (req, res) => {
 
@@ -174,9 +162,6 @@ router.get("/dashboard/stats", async (req, res) => {
 });
 
 
-// ============================
-// UPDATE STATUS
-// ============================
 
 router.put("/update-status/:id", async (req, res) => {
 
@@ -224,9 +209,6 @@ router.put("/update-status/:id", async (req, res) => {
 });
 
 
-// ============================
-// GET USER ORDERS
-// ============================
 
 router.get("/:email", async (req, res) => {
 
