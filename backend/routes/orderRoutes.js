@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 
@@ -5,10 +6,12 @@ const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
 
-// ======================================================
-// ✅ PLACE ORDER
-// ======================================================
+// ============================
+// PLACE ORDER
+// ============================
+
 router.post("/", async (req, res) => {
+
   try {
 
     const {
@@ -17,9 +20,6 @@ router.post("/", async (req, res) => {
       totalAmount
     } = req.body;
 
-    // ======================================
-    // ✅ VALIDATIONS
-    // ======================================
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -45,27 +45,17 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // ======================================
-    // ✅ CREATE ORDER
-    // ======================================
     const newOrder = new Order({
       email,
       items,
       totalAmount,
-
       status: "Pending"
     });
 
     await newOrder.save();
 
-    // ======================================
-    // ✅ CLEAR USER CART
-    // ======================================
     await Cart.deleteMany({ email });
 
-    // ======================================
-    // ✅ RESPONSE
-    // ======================================
     res.status(201).json({
       success: true,
       message: "Order placed successfully",
@@ -84,110 +74,10 @@ router.post("/", async (req, res) => {
 });
 
 
-// ======================================================
-// ✅ UPDATE ORDER STATUS
-// ======================================================
-router.put("/update-status/:id", async (req, res) => {
+// ============================
+// GET ALL ORDERS
+// ============================
 
-  try {
-
-    const { status } = req.body;
-
-    // ======================================
-    // ✅ VALID STATUSES
-    // ======================================
-    const validStatuses = [
-      "Pending",
-      "Shipped",
-      "Delivered",
-      "Out for delivery"
-    ];
-
-    // ======================================
-    // ✅ VALIDATION
-    // ======================================
-    if (!validStatuses.includes(status)) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Invalid status"
-      });
-    }
-
-    // ======================================
-    // ✅ UPDATE STATUS
-    // ======================================
-    const updatedOrder =
-      await Order.findByIdAndUpdate(
-        req.params.id,
-        { status },
-        { new: true }
-      );
-
-    // ======================================
-    // ✅ RESPONSE
-    // ======================================
-    res.json({
-      success: true,
-      message: "Status updated successfully",
-      order: updatedOrder
-    });
-
-  } catch (err) {
-
-    console.error("Update status error:", err);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
-  }
-});
-
-
-// ======================================================
-// ✅ GET USER ORDERS BY EMAIL
-// ======================================================
-router.get("/:email", async (req, res) => {
-
-  try {
-
-    const { email } = req.params;
-
-    if (!email) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Email required"
-      });
-    }
-
-    // ======================================
-    // ✅ FETCH ORDERS
-    // ======================================
-    const orders = await Order.find({
-      email
-    }).sort({
-      createdAt: -1
-    });
-
-    res.json(orders);
-
-  } catch (err) {
-
-    console.error("Fetch user orders error:", err);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
-  }
-});
-
-
-// ======================================================
-// ✅ GET ALL ORDERS (ADMIN)
-// ======================================================
 router.get("/", async (req, res) => {
 
   try {
@@ -211,22 +101,17 @@ router.get("/", async (req, res) => {
 });
 
 
-// ======================================================
-// ✅ DASHBOARD STATS
-// ======================================================
+// ============================
+// DASHBOARD STATS
+// ============================
+
 router.get("/dashboard/stats", async (req, res) => {
 
   try {
 
-    // ======================================
-    // ✅ TOTAL ORDERS
-    // ======================================
     const totalOrders =
       await Order.countDocuments();
 
-    // ======================================
-    // ✅ TOTAL REVENUE
-    // ======================================
     const revenueData =
       await Order.aggregate([
         {
@@ -239,9 +124,6 @@ router.get("/dashboard/stats", async (req, res) => {
         }
       ]);
 
-    // ======================================
-    // ✅ ORDER STATUS COUNTS
-    // ======================================
     const delivered =
       await Order.countDocuments({
         status: "Delivered"
@@ -262,12 +144,8 @@ router.get("/dashboard/stats", async (req, res) => {
         status: "Out for delivery"
       });
 
-    // ======================================
-    // ✅ RESPONSE
-    // ======================================
     res.json({
       success: true,
-
       totalOrders,
 
       totalRevenue:
@@ -285,6 +163,89 @@ router.get("/dashboard/stats", async (req, res) => {
 
     console.error(
       "Dashboard stats error:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
+
+// ============================
+// UPDATE STATUS
+// ============================
+
+router.put("/update-status/:id", async (req, res) => {
+
+  try {
+
+    const { status } = req.body;
+
+    const validStatuses = [
+      "Pending",
+      "Shipped",
+      "Delivered",
+      "Out for delivery"
+    ];
+
+    if (!validStatuses.includes(status)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status"
+      });
+    }
+
+    const updatedOrder =
+      await Order.findByIdAndUpdate(
+        req.params.id,
+        { status },
+        { new: true }
+      );
+
+    res.json({
+      success: true,
+      message: "Status updated successfully",
+      order: updatedOrder
+    });
+
+  } catch (err) {
+
+    console.error("Update status error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
+
+// ============================
+// GET USER ORDERS
+// ============================
+
+router.get("/:email", async (req, res) => {
+
+  try {
+
+    const { email } = req.params;
+
+    const orders = await Order.find({
+      email
+    }).sort({
+      createdAt: -1
+    });
+
+    res.json(orders);
+
+  } catch (err) {
+
+    console.error(
+      "Fetch user orders error:",
       err
     );
 
