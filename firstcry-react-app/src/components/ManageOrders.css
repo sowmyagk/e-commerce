@@ -1,0 +1,139 @@
+.manage-orders-page{
+padding:35px;
+background:#f8f8f8;
+min-height:100vh;
+font-family:Arial;
+}
+
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.top-bar h2{
+font-size:28px;
+margin:0;
+}
+
+.top-bar span{
+background:#fc2779;
+color:white;
+padding:8px 14px;
+border-radius:20px;
+font-size:14px;
+}
+
+.order-card{
+background:white;
+border-radius:18px;
+padding:25px;
+margin-bottom:22px;
+box-shadow:0 8px 20px rgba(0,0,0,0.06);
+}
+
+.order-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:15px;
+}
+
+.order-header h3{
+margin:0;
+font-size:22px;
+}
+
+.order-header p{
+margin-top:6px;
+color:gray;
+font-size:14px;
+}
+
+.status-badge{
+padding:8px 16px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+color:white;
+}
+
+.status-badge.pending{
+background:#ff9800;
+}
+
+.status-badge.placed{
+background:#673ab7;
+}
+
+.status-badge.shipped{
+background:#2196f3;
+}
+
+.status-badge.delivered{
+background:#4caf50;
+}
+
+.order-details{
+display:flex;
+gap:40px;
+margin:18px 0;
+font-size:15px;
+}
+
+.product-section{
+margin-top:18px;
+padding-top:15px;
+border-top:1px solid #eee;
+}
+
+.product-section h4{
+margin-bottom:15px;
+}
+
+.product-row{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:14px;
+padding:10px;
+background:#fafafa;
+border-radius:12px;
+}
+
+.product-row img{
+width:55px;
+height:55px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.product-row p{
+margin:0;
+font-size:15px;
+font-weight:600;
+}
+
+.product-row span{
+font-size:13px;
+color:gray;
+}
+
+.product-row b{
+margin-left:auto;
+color:#fc2779;
+}
+
+.status-section{
+margin-top:18px;
+text-align:right;
+}
+
+.status-section select{
+padding:10px 14px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:14px;
+cursor:pointer;
+}
