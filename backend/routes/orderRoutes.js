@@ -1,28 +1,55 @@
 const express = require("express");
 const router = express.Router();
+
 const Order = require("../models/Order");
 const Cart = require("../models/cart");
 
 
+// ======================================================
+// ✅ PLACE ORDER
+// ======================================================
 router.post("/", async (req, res) => {
   try {
-    const { email, items, totalAmount } = req.body;
 
-    // 🔒 VALIDATIONS
+    const {
+      email,
+      items,
+      totalAmount
+    } = req.body;
+
+    // ======================================
+    // ✅ VALIDATIONS
+    // ======================================
     if (!email) {
-      return res.status(400).json({ message: "User email required" });
+      return res.status(400).json({
+        success: false,
+        message: "User email required"
+      });
     }
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: "No items provided" });
+    if (
+      !items ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "No items provided"
+      });
     }
 
     if (!totalAmount) {
-      return res.status(400).json({ message: "Total amount required" });
+      return res.status(400).json({
+        success: false,
+        message: "Total amount required"
+      });
     }
 
+    // ======================================
+    // ✅ CREATE ORDER
+    // ======================================
     const newOrder = new Order({
-      email,        
+      email,
       items,
       totalAmount,
 
@@ -31,9 +58,14 @@ router.post("/", async (req, res) => {
 
     await newOrder.save();
 
-   
-    await Cart.deleteMany({ email });  
+    // ======================================
+    // ✅ CLEAR USER CART
+    // ======================================
+    await Cart.deleteMany({ email });
 
+    // ======================================
+    // ✅ RESPONSE
+    // ======================================
     res.status(201).json({
       success: true,
       message: "Order placed successfully",
@@ -41,49 +73,225 @@ router.post("/", async (req, res) => {
     });
 
   } catch (err) {
+
     console.error("Order error:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 });
 
 
+// ======================================================
+// ✅ UPDATE ORDER STATUS
+// ======================================================
 router.put("/update-status/:id", async (req, res) => {
+
   try {
+
     const { status } = req.body;
 
-    await Order.findByIdAndUpdate(req.params.id, { status });
+    // ======================================
+    // ✅ VALID STATUSES
+    // ======================================
+    const validStatuses = [
+      "Pending",
+      "Shipped",
+      "Delivered",
+      "Out for delivery"
+    ];
 
-    res.json({ success: true });
+    // ======================================
+    // ✅ VALIDATION
+    // ======================================
+    if (!validStatuses.includes(status)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status"
+      });
+    }
+
+    // ======================================
+    // ✅ UPDATE STATUS
+    // ======================================
+    const updatedOrder =
+      await Order.findByIdAndUpdate(
+        req.params.id,
+        { status },
+        { new: true }
+      );
+
+    // ======================================
+    // ✅ RESPONSE
+    // ======================================
+    res.json({
+      success: true,
+      message: "Status updated successfully",
+      order: updatedOrder
+    });
+
   } catch (err) {
-    res.status(500).json(err);
+
+    console.error("Update status error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 });
 
+
+// ======================================================
+// ✅ GET USER ORDERS BY EMAIL
+// ======================================================
 router.get("/:email", async (req, res) => {
+
   try {
+
     const { email } = req.params;
 
     if (!email) {
-      return res.status(400).json({ message: "User email required" });
+
+      return res.status(400).json({
+        success: false,
+        message: "Email required"
+      });
     }
 
-    const orders = await Order.find({ email }).sort({ createdAt: -1 });
+    // ======================================
+    // ✅ FETCH ORDERS
+    // ======================================
+    const orders = await Order.find({
+      email
+    }).sort({
+      createdAt: -1
+    });
 
     res.json(orders);
 
   } catch (err) {
-    console.error("Fetch orders error:", err);
-    res.status(500).json({ error: "Server error" });
+
+    console.error("Fetch user orders error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 });
 
+
+// ======================================================
+// ✅ GET ALL ORDERS (ADMIN)
+// ======================================================
 router.get("/", async (req, res) => {
+
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+
+    const orders = await Order.find()
+      .sort({
+        createdAt: -1
+      });
+
     res.json(orders);
+
   } catch (err) {
+
     console.error("Fetch all orders error:", err);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
+
+// ======================================================
+// ✅ DASHBOARD STATS
+// ======================================================
+router.get("/dashboard/stats", async (req, res) => {
+
+  try {
+
+    // ======================================
+    // ✅ TOTAL ORDERS
+    // ======================================
+    const totalOrders =
+      await Order.countDocuments();
+
+    // ======================================
+    // ✅ TOTAL REVENUE
+    // ======================================
+    const revenueData =
+      await Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalRevenue: {
+              $sum: "$totalAmount"
+            }
+          }
+        }
+      ]);
+
+    // ======================================
+    // ✅ ORDER STATUS COUNTS
+    // ======================================
+    const delivered =
+      await Order.countDocuments({
+        status: "Delivered"
+      });
+
+    const pending =
+      await Order.countDocuments({
+        status: "Pending"
+      });
+
+    const shipped =
+      await Order.countDocuments({
+        status: "Shipped"
+      });
+
+    const outForDelivery =
+      await Order.countDocuments({
+        status: "Out for delivery"
+      });
+
+    // ======================================
+    // ✅ RESPONSE
+    // ======================================
+    res.json({
+      success: true,
+
+      totalOrders,
+
+      totalRevenue:
+        revenueData.length > 0
+          ? revenueData[0].totalRevenue
+          : 0,
+
+      delivered,
+      pending,
+      shipped,
+      outForDelivery
+    });
+
+  } catch (err) {
+
+    console.error(
+      "Dashboard stats error:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 });
 

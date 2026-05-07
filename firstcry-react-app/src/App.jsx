@@ -14,6 +14,8 @@ import OrderHistory from "./pages/OrderHistory";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
 import Success from "./pages/Success";
+import Users from "./components/Users";
+
 
 function App() {
   return (
@@ -35,6 +37,7 @@ function App() {
       <Route path="/payment" element={<Payment />} />
       <Route path="/success" element={<Success />} />
       <Route path="/cancel" element={<h2>Payment Cancelled </h2>} />
+      <Route path="/users" element={<Users />} />
     </Routes>
   );
 }
