@@ -5,11 +5,13 @@ function ManageOrders() {
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = () => {
-    fetch("https://e-commerce-3r11.onrender.com/api/admin/orders")
+    fetch("https://e-commerce-3r11.onrender.com/api/orders")
       .then(res => res.json())
       .then(data => setOrders(data))
       .catch(err => console.log(err));
   };
+
+  console.log(orders);
 
   useEffect(() => {
     fetchOrders();
@@ -18,7 +20,7 @@ function ManageOrders() {
   const updateStatus = async (id, status) => {
     try {
       await fetch(
-        `https://e-commerce-3r11.onrender.com/api/admin/orders/${id}`,
+        `https://e-commerce-3r11.onrender.com/api/orders/update-status/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -53,11 +55,11 @@ function ManageOrders() {
       {orders.map(order => (
         <div className="order-card" key={order._id}>
 
-          <h3>{order.name}</h3>
-          <p>{order.address}</p>
+          {/* <h3>{order.name}</h3>
+          <p>{order.address}</p> */}
 
           <p><strong>Total:</strong> ₹{order.totalAmount}</p>
-          <p><strong>Payment:</strong> {order.paymentMethod}</p>
+          <p><strong>Payment:</strong> {order.paymentStatus}</p>
 
           
           <div className="product-section">
@@ -65,7 +67,7 @@ function ManageOrders() {
               <div className="product-row" key={i}>
 
                 <img
-                  src={item.productId?.image}
+                  src={item.image}
                   alt=""
                 />
 
@@ -73,8 +75,6 @@ function ManageOrders() {
                   <p>{item.productId?.name}</p>
                   <span>Qty: {item.quantity}</span>
                 </div>
-
-                <b>₹{item.productId?.price}</b>
 
               </div>
             ))}

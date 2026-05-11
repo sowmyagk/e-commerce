@@ -27,17 +27,23 @@ function AdminDashboard() {
   const API_URL = import.meta.env.VITE_API_URL;
 
   const [stats, setStats] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    delivered: 0,
-    pending: 0,
-    shipped: 0,
-    outForDelivery: 0
-  });
+  totalOrders: 0,
+  totalProducts: 0,
+  totalUsers: 0,
+  totalRevenue: 0,
+  delivered: 0,
+  pending: 0,
+  shipped: 0,
+  outForDelivery: 0
+});
+
+  const [monthlyOrders, setMonthlyOrders] = useState([]);
+  const [salesData, setSalesData] = useState([]);
 
   useEffect(() => {
 
-    fetch(`${API_URL}/orders/dashboard/stats`)
+
+    fetch(`${API_URL}/api/admin/order-status`)
       .then((res) => res.json())
       .then((data) => {
 
@@ -48,6 +54,46 @@ function AdminDashboard() {
       })
       .catch((err) => {
         console.error("Dashboard fetch error:", err);
+      });
+
+   
+  console.log(stats.totalProducts)
+
+    fetch(`${API_URL}/api/admin/sales`)
+      .then((res) => res.json())
+      .then((data) => {
+
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ];
+
+        const formattedOrders = data.map((item) => ({
+          month: months[item._id - 1],
+          orders: item.orders
+        }));
+
+        const formattedSales = data.map((item) => ({
+          month: months[item._id - 1],
+          revenue: item.totalSales
+        }));
+
+        setMonthlyOrders(formattedOrders);
+        setSalesData(formattedSales);
+
+      })
+      .catch((err) => {
+        console.error("Sales fetch error:", err);
       });
 
   }, []);
@@ -71,35 +117,22 @@ function AdminDashboard() {
     }
   ];
 
-  const monthlyOrders = [
-    { month: "Jan", orders: 5 },
-    { month: "Feb", orders: 10 },
-    { month: "Mar", orders: 15 },
-    { month: "Apr", orders: 20 },
-    { month: "May", orders: 25 },
-  ];
-
-  const salesData = [
-    { month: "Jan", revenue: 2000 },
-    { month: "Feb", revenue: 5000 },
-    { month: "Mar", revenue: 7000 },
-    { month: "Apr", revenue: 9000 },
-    { month: "May", revenue: 12000 },
-  ];
-
   return (
     <div className="admin-layout">
+
+     
 
       <div className="sidebar">
 
         <h2>Admin Panel</h2>
 
         <ul>
+
           <li onClick={() => navigate("/admindashboard")}>
             Dashboard
           </li>
 
-          <li onClick={() => navigate("/adminorders")}>
+          <li onClick={() => navigate("/manageorders")}>
             Orders
           </li>
 
@@ -110,9 +143,12 @@ function AdminDashboard() {
           <li onClick={() => navigate("/addproduct")}>
             Add Product
           </li>
+
         </ul>
 
       </div>
+
+     
 
       <div className="main-content">
 
@@ -121,6 +157,8 @@ function AdminDashboard() {
         <p className="subtitle">
           Here's your store analytics overview
         </p>
+
+        
 
         <div className="card-container">
 
@@ -144,9 +182,17 @@ function AdminDashboard() {
             <p>{stats.pending}</p>
           </div>
 
+          <div className="card">
+  <h4>Total Products</h4>
+  <p>{stats.totalProducts}</p>
+</div>
+
         </div>
 
+
         <div className="charts-row">
+
+          {/* PIE CHART */}
 
           <div className="chart-box">
 
@@ -210,6 +256,7 @@ function AdminDashboard() {
 
         </div>
 
+
         <div className="charts-row">
 
           <div className="chart-box full">
@@ -227,6 +274,8 @@ function AdminDashboard() {
                 <YAxis />
 
                 <Tooltip />
+
+                <Legend />
 
                 <Line
                   type="monotone"

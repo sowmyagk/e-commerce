@@ -6,7 +6,6 @@ const Order = require("../models/Order");
 const Cart = require("../models/cart");
 const User = require("../models/User");
 
-
 router.post("/", async (req, res) => {
 
   try {

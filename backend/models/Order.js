@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
+
   email: String,
 
   userId: {
@@ -22,8 +23,14 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["Pending", "Shipped", "Delivered", "Out for delivery"],
-    default: "Pending"
+    enum: [
+      "Pending",
+      "Shipped",
+      "Delivered",
+      "Out for delivery",
+      "Processing"
+    ],
+    default: "Processing"
   },
 
   paymentMethod: {
